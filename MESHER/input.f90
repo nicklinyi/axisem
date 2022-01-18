@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
@@ -26,29 +26,29 @@ module input
   use data_diag
   use data_coarse
   use data_bkgrdmodel
-  
+
   implicit none
-  
+
   public :: read_params
   private
-  
+
   contains
 
 !-----------------------------------------------------------------------------------------
 subroutine read_params
-  
+
   use global_parameters
   use data_mesh
   use data_spec
   use background_models, only: override_ext_q
-  
+
   character(len=100)    :: keyword, keyvalue, line
   integer               :: iinparam_mesh = 500, ioerr
-  
+
   keyword = ' '
   keyvalue = ' '
-  line = ' ' 
- 
+  line = ' '
+
   ! Default values
   bkgrdmodel      = 'UNDEFINED'
   override_ext_q  = 'none'
@@ -61,35 +61,32 @@ subroutine read_params
   npol            = 4
   pts_wavelngth   = 1.5
   courant         = 0.6
-  local_max_colat = 180.
-  max_depth       = -1.  
+  router          = 6.371e6
   axisfac         = 0.7
   fluidfac        = 0.9
-  router          = 6.371e6
   dump_mesh_info_files = .false.
   dump_mesh_info_screen = .false.
   only_suggest_ntheta = .false.
   diagpath        = 'Diags'
-  lfdiag          = index(diagpath,' ') - 1 
+  lfdiag          = index(diagpath,' ') - 1
 
 
-  write(6, '(A)', advance='no') 'Reading inparam_mesh...'
+  write(*, '(A)', advance='no') 'Reading inparam_mesh...'
   open(unit=iinparam_mesh, file='./inparam_mesh', status='old', action='read', &
        iostat=ioerr)
-  if (ioerr.ne.0) stop 'Check input file ''inparam_mesh''! Is it still there?' 
- 
+  if (ioerr /= 0) stop 'Check input file ''inparam_mesh''! Is it still there?'
+
   do
       read(iinparam_mesh,fmt='(a100)',iostat=ioerr) line
-      if (ioerr.lt.0) exit
-      if (len(trim(line)).lt.1.or.line(1:1).eq.'#') cycle
-     
-      read(line,*) keyword, keyvalue 
+      if (ioerr < 0) exit
+      if (len(trim(line)) < 1 .or. line(1:1) == '#') cycle
 
+      read(line,*) keyword, keyvalue
       parameter_to_read : select case(trim(keyword))
-      
-      case('BACKGROUND_MODEL') 
+
+      case('BACKGROUND_MODEL')
           bkgrdmodel = keyvalue
-          lfbkgrdmodel = index(bkgrdmodel,' ') - 1 
+          lfbkgrdmodel = index(bkgrdmodel,' ') - 1
 
       case('EXT_MODEL')
           fnam_ext_model = keyvalue
@@ -108,7 +105,7 @@ subroutine read_params
 
       case('ONLY_SUGGEST_NTHETA')
           read(keyvalue, *) only_suggest_ntheta
-      
+
       case('WRITE_VTK')
           read(keyvalue, *) dump_mesh_vtk
 
@@ -127,17 +124,14 @@ subroutine read_params
       case('COURANT_NR')
           read(keyvalue, *) courant
 
-      case('LOCAL_MAX_COLAT')
-          read(keyvalue, *) local_max_colat
+      case('RADIUS')
+          read(keyvalue, *) router
 
-      case('MAX_DEPTH')
-          read(keyvalue, *) max_depth
+      case('AXIS_SHRINKING_FACTOR')
+          read(keyvalue, *) axisfac
 
-      case('AXIS_SHRINKING_FACTOR') 
-          read(keyvalue, *) axisfac 
-
-      case('FLUID_SHRINKING_FACTOR') 
-          read(keyvalue, *) fluidfac 
+      case('FLUID_SHRINKING_FACTOR')
+          read(keyvalue, *) fluidfac
 
       case('SAVE_DEBUG_FILES')
           read(keyvalue, *) dump_mesh_info_files
@@ -145,58 +139,44 @@ subroutine read_params
       case('VERBOSE')
           read(keyvalue, *) dump_mesh_info_screen
 
-      case default
-          write(6,*) "Unknkown parameter "//trim(keyword)//" in inparam_mesh"
-          stop
-
       end select parameter_to_read
-  end do
+  enddo
 
-  if (trim(bkgrdmodel).eq.'UNDEFINED') then
-      write(6,20) 'BACKGROUND_MODEL' 
+  if (trim(bkgrdmodel) == 'UNDEFINED') then
+      write(*,20) 'BACKGROUND_MODEL'
       stop
-  end if
+  endif
 
-  if (nthetaslices==-1) then
-      write(6,20) 'NTHETA_SLICES'
+  if (nthetaslices == -1) then
+      write(*,20) 'NTHETA_SLICES'
       stop
-  end if
-
-  if (local_max_colat == 180.) then
-      local_lat_fac = pi / 2
-  else
-      local_lat_fac = pi / (180. / local_max_colat) 
-  end if
-  
-  if (local_max_colat > 180. .or. local_max_colat <= 0.) then
-      write(6,*) 'LOCAL_MAX_COLAT should be in (0., 180.]' 
-      stop
-  end if
+  endif
 
   if (only_suggest_ntheta) nthetaslices = 4
 
-  if (period==-1) then
-      write(6,20) 'DOMINANT_PERIOD'
+  if (period == -1) then
+      write(*,20) 'DOMINANT_PERIOD'
       stop
-  end if
+  endif
 20 format('ERROR: Parameter ', A, ' not set in inparam_mesh')
-  write(6,*) 'done'
+  write(*,*) 'done'
 
-  
-  write(6,*) ''
-  write(6,*) 'PREDEFINED MODEL/SIMULATION PARAMETERS'
-  write(6,*) 'Background model                 : ',bkgrdmodel(1:lfbkgrdmodel)
-  write(6,*) 'Dominant period [s]              : ',period
-  write(6,*) 'Elements per dominant wavelength : ',pts_wavelngth
-  write(6,*) 'Courant number                   : ',courant
-  write(6,*) 'coarsening levels                : ',nc_init
-  write(6,*) 'processors used in solver        : ',nthetaslices
-  write(6,*) 'save mesh info files?            : ',dump_mesh_info_files
-  write(6,*) 'print mesh info to screen?       : ',dump_mesh_info_screen
-  write(6,*) 'path to dump output files        : ',trim(diagpath)
-  write(6,*) 
+
+  print *
+  write(*,*) 'PREDEFINED MODEL/SIMULATION PARAMETERS'
+  write(*,*) 'Background model                 : ',bkgrdmodel(1:lfbkgrdmodel)
+  write(*,*) 'Dominant period [s]              : ',period
+  write(*,*) 'Elements per dominant wavelength : ',pts_wavelngth
+  write(*,*) 'Courant number                   : ',courant
+  write(*,*) 'coarsening levels                : ',nc_init
+  write(*,*) 'processors used in solver        : ',nthetaslices
+  write(*,*) 'outer radius [m]                 : ',router
+  write(*,*) 'save mesh info files?            : ',dump_mesh_info_files
+  write(*,*) 'print mesh info to screen?       : ',dump_mesh_info_screen
+  write(*,*) 'path to dump output files        : ',trim(diagpath)
+  write(*,*)
   call flush(6)
-  
+
 end subroutine read_params
 !-----------------------------------------------------------------------------------------
 

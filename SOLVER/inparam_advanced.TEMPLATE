@@ -28,7 +28,7 @@ SOURCE_PERIOD       0.0
 # 'quheavi': Heaviside function
 # 'dirac_0': Dirac delta function
 #            This should be used to convolve arbitrary STFs in Postprocessing 
-SOURCE_FUNCTION     gauss_0
+SOURCE_FUNCTION     errorf
 
 # Time integration scheme, allowed:
 # newmark2:  default, well tested
@@ -53,7 +53,7 @@ INFO_DIR        "./Info"
 # Enabling this option will put all seismograms and wavefields into one file
 # axisem_output.nc4 in the $DATA directory. Postprocessing will automatically
 # read and process this file.
-USE_NETCDF          true
+USE_NETCDF          false
 
 # Do Checkpointing for the NetCDF seismogram output. Will save the seismograms 
 # every 5% of the total runtime to have at least something, should the solver
@@ -67,8 +67,8 @@ CHECKPOINTING       true
 # meshes (<10s) running on few cores, setting a value above 256 can require >>10GB of
 # memory per CPU. When using CHUNK_TIME_TRACES and many cores, a value larger
 # then the number of strain samples might be appropriate.
-# Default value: 64
-NETCDF_DUMP_BUFFER  64
+# Default value: 128
+NETCDF_DUMP_BUFFER  128
 
 # Chunking of the kernel wavefields: Default is snapshots to write to contiguous
 # regions on the drive. When running on many cores and using collective IO, it
@@ -131,8 +131,8 @@ MESH_TEST           false
 
 ######################## SENSITIVITY KERNELS ###################################
 # Save necessary wavefields for Kernel calculation or Instaseis databases
-# N.b. Kernel calculation needs MCKernel (sold separately)
-KERNEL_WAVEFIELDS   true
+# N.b. Kernel calculation needs Axisem Kerner (sold separately)
+KERNEL_WAVEFIELDS   false 
 
 # different modes of dumping wavefields for kernel:
 #  - fullfields: strain and velocity at a subset of local GLL points (see below)
@@ -141,13 +141,13 @@ KERNEL_WAVEFIELDS   true
 KERNEL_DUMPTYPE     displ_only
 
 # Samples per period
-KERNEL_SPP          4
+KERNEL_SPP          8
 
 # source vicinity in wavefields? 
-# igno (default)
-# mask 
+# igno
+# mask  (default)
 # anal 
-KERNEL_SOURCE       igno
+KERNEL_SOURCE       mask
 
 # GLL points to save, starting and ending GLL point index 
 # (overwritten with 0 and npol for dumptype displ_only)
@@ -163,7 +163,7 @@ KERNEL_COLAT_MAX   180.
 
 # minimal and maximal radius in km for kernel wavefields
 # (only for dumptype displ_only)
-KERNEL_RMIN        6171.
+KERNEL_RMIN        0.
 KERNEL_RMAX        7000.
 
 ######################## ATTENUATION ###########################################

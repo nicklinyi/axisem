@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !===========================
@@ -45,17 +45,17 @@ logical :: ljunk,interpolate_seis,even_spaced_theta,theta_discrete_smaller
 logical :: usenetcdf
 real, parameter :: pi = 3.14159265
 
-! >>>>> Static parameters <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> Static parameters <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
 interpolate_seis=.false.
 num_interp = 2
 ! choose from spline (linear),sinc,idw (inverse distance weighting)
 interp_method='sinc'
 p=3
 
-if (trim(interp_method)=='spline') num_interp=2
+if (trim(interp_method) == 'spline') num_interp=2
 if (.not. interpolate_seis) interp_method='closest'
 
-! >>>>> Receiver information <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> Receiver information <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
 open(unit=99,file='receiver_info.dat')
   read(99,*)nrec,components,colat,model
   call def_rec_comp(components,reccomp)
@@ -66,9 +66,9 @@ open(unit=99,file='receiver_info.dat')
      th_rec(irec)=reclat*deg2rad; ph_rec(irec)=reclon*deg2rad
   enddo
 close(99)
-if (colat/='colat') th_rec=pi/2.-th_rec
+if (colat /= 'colat') th_rec=pi/2.-th_rec
 
-! >>>>> Source information <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> Source information <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
 open(unit=20000,file='CMTSOLUTION',POSITION='REWIND',status='old')
   read(20000,*)stf_type,src_header(1:12)
   read(20000,*)junk,junk,eventname
@@ -86,12 +86,12 @@ open(unit=20000,file='CMTSOLUTION',POSITION='REWIND',status='old')
 close(20000)
 Mij=Mij/1.E7  ! CMTSOLUTION given in dyn-cm
 Mij=Mij/1.E20 ! simulated sources are for 1E20.
-write(6,*)'maximum Mij:',maxval(Mij)
+write(*,*)'maximum Mij:',maxval(Mij)
 
-! >>>>> Find closest depth and model <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> Find closest depth and model <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
 call depths(srcdepth,model,dirname)
 
-! >>>>> load simulation info <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> load simulation info <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
 open(unit=99,file=trim(dirname)//'MZZ/simulation.info')
   read(99,*)junk
   read(99,*)rjunk
@@ -127,55 +127,55 @@ do it=1,nt
    t(it)=dt*real(it)
 enddo
 shift_fact = shift_fact+1.5*period
-write(6,*)'shift factor:',shift_fact
+write(*,*)'shift factor:',shift_fact
 call define_io_appendix(appidur,int(period))
 
-! >>>>> Rotate & extract epicentral distance <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> Rotate & extract epicentral distance <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
 th_src=(90.-srclat)*deg2rad; ph_src=srclon*deg2rad
 allocate(th_rec_rot(nrec),ph_rec_rot(nrec))
 call rotate_src_rec(th_src,ph_src,nrec,th_rec,ph_rec,th_rec_rot,ph_rec_rot,rot_mat)
 
 even_spaced_theta=.false.
-if (dtheta_rec>0.) even_spaced_theta=.true.
+if (dtheta_rec > 0.) even_spaced_theta=.true.
 if (.not. even_spaced_theta) interpolate_seis=.false.
 
 ! plot original source and receiver locations in google earth kml file with link to seismogram images
   call save_google_earth_kml(th_src,ph_src,src_depth_sim,Mij,period,th_rec,ph_rec,interp_method, &
                              appidur,th_rec_rot,ph_rec_rot,reccomp,nrec,recname)
 
-! >>>>> prepare receiver index + neighbors <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-if (.not. even_spaced_theta) then ! brute force search based on monotonous guesses. 
+! >>>>> prepare receiver index + neighbors <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
+if (.not. even_spaced_theta) then ! brute force search based on monotonous guesses.
    allocate(epidist(nrec_sim),deltatheta(nrec_sim))
    open(unit=98,file=trim(dirname)//'/MZZ/Data/receiver_pts.dat')
    do irec=1,nrec_sim
       read(98,*)epidist(irec),rjunk,ijunk
-      if (irec>1) deltatheta(irec-1)=epidist(irec)-epidist(irec-1)
+      if (irec > 1) deltatheta(irec-1)=epidist(irec)-epidist(irec-1)
    enddo
    deltatheta(nrec_sim)=deltatheta(nrec_sim-1)
    close(98)
-   
-   if (nrec_sim>360) then  ! require 2 points per interval
+
+   if (nrec_sim > 360) then  ! require 2 points per interval
       nr_per_deg = int(real(nrec_sim)/180.)
-   elseif (nrec_sim>180) then
+   else if (nrec_sim > 180) then
       nr_per_deg = int(real(nrec_sim)/90.)
-   elseif (nrec_sim>90) then
+   else if (nrec_sim > 90) then
       nr_per_deg = int(real(nrec_sim)/45.)
-   elseif (nrec_sim>45) then 
+   else if (nrec_sim > 45) then
       nr_per_deg = int(real(nrec_sim)/22.5)
-   elseif (nrec_sim>23) then 
+   else if (nrec_sim > 23) then
       nr_per_deg = int(real(nrec_sim)/11.5)
    endif
-   write(6,*)'Min/max epidist [deg]:',minval(epidist),maxval(epidist),nr_per_deg
-   write(6,*)'Min/max delta theta [deg]:',minval(deltatheta),maxval(deltatheta)
+   write(*,*)'Min/max epidist [deg]:',minval(epidist),maxval(epidist),nr_per_deg
+   write(*,*)'Min/max delta theta [deg]:',minval(deltatheta),maxval(deltatheta)
 endif
 if (interpolate_seis) allocate(mask_min(nrec_sim))
 
-if (period==0.) then 
+if (period == 0.) then
    lam_deg = period_sim*5.8/111.195
 else
    lam_deg = period*5.8/111.195
 endif
-write(6,*)'period,P-wavelength: [deg]',lam_deg
+write(*,*)'period,P-wavelength: [deg]',lam_deg
 
 if (interpolate_seis) allocate(seistmp(nt,3))
 allocate(w(num_interp))
@@ -190,83 +190,83 @@ do irec=1,nrec
 !--------------
    theta_discrete_smaller = .false.
 
-! >>>>> find receiver index + neighbors <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> find receiver index + neighbors <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
    if (.not. even_spaced_theta) then ! brute force minimization - slower
-      ind1 = floor(th_rec_rot(irec)*rad2deg)*nr_per_deg 
+      ind1 = floor(th_rec_rot(irec)*rad2deg)*nr_per_deg
       ind2 = max(min(nrec_sim,ceiling(th_rec_rot(irec)*rad2deg)*nr_per_deg),ind1+1)
       ind_rec = ind1+minloc(abs(th_rec_rot(irec)*rad2deg - epidist(ind1:ind2)),1)
-!      write(6,*)'INDICES:',ind1,ind2,ind_rec
+!      write(*,*)'INDICES:',ind1,ind2,ind_rec
       dtheta_off = th_rec_rot(irec)*rad2deg-epidist(ind_rec)
-      write(6,*)'Receiver #, desired/offered th [deg]:',irec,th_rec_rot(irec)*rad2deg,epidist(ind_rec)
+      write(*,*)'Receiver #, desired/offered th [deg]:',irec,th_rec_rot(irec)*rad2deg,epidist(ind_rec)
 
    else  ! even-spaced theta... find via distance difference - faster (?)
       ind_rec = floor(th_rec_rot(irec)*rad2deg/dtheta_rec)+1
-      if (abs(th_rec_rot(irec)*rad2deg-real(ind_rec-1)*dtheta_rec)>dtheta_rec/2.) ind_rec = ind_rec+1 
+      if (abs(th_rec_rot(irec)*rad2deg-real(ind_rec-1)*dtheta_rec) > dtheta_rec/2.) ind_rec = ind_rec+1
       dtheta_off = th_rec_rot(irec)*rad2deg-(ind_rec-1)*dtheta_rec
-      write(6,*)'desired/offered th [deg], lam-frac diff :',&
+      write(*,*)'desired/offered th [deg], lam-frac diff :', &
             th_rec_rot(irec)*rad2deg,ind_rec,(ind_rec-1)*dtheta_rec,abs(dtheta_off)/lam_deg
    endif
-   if (dtheta_off>0.) theta_discrete_smaller = .true.
+   if (dtheta_off > 0.) theta_discrete_smaller = .true.
    theta_over_dtheta = th_rec_rot(irec)*rad2deg/abs(dtheta_rec)
-!   write(6,*)'theta/dtheta:',theta_over_dtheta
+!   write(*,*)'theta/dtheta:',theta_over_dtheta
 
-! >>>>> calculate moment tensor and azimuth prefactors/radiation patterns <<<<<<<
+! >>>>> calculate moment tensor and azimuth prefactors/radiation patterns <  <  <  <  <  <  <
    call compute_radiation_prefactor(Mij,ph_rec_rot(irec),mij_phi)
 
-! >>>>> load seismograms <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> load seismograms <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
    if (.not. interpolate_seis) then ! choosing closest location
       if (usenetcdf) then
-	      call nc_read_seis(ncid_in, nc_disp_varid, ind_rec, nt, seis_snglcomp)
-	  else
+        call nc_read_seis(ncid_in, nc_disp_varid, ind_rec, nt, seis_snglcomp)
+    else
           call read_seis(dirname,ind_rec,nt,seis_snglcomp)
-      end if
+      endif
       call sum_individual_wavefields(seis,seis_snglcomp,nt,mij_phi)
 
    else ! interpolation using num_interp locations
       count_neg = max(1,ind_rec-num_interp/2)
 !      if (theta_discrete_smaller) count_neg = count_neg -1
-      write(6,*)irec,'num_interp,count neg,ind_rec:',num_interp,count_neg,ind_rec
+      write(*,*)irec,'num_interp,count neg,ind_rec:',num_interp,count_neg,ind_rec
       seis=0.; seistmp=0.
-      if (trim(interp_method)=='idw') then 
+      if (trim(interp_method) == 'idw') then
          do i=1,num_interp
             w(i) = 1./(th_rec_rot(irec) - real(count_neg+i-1)*dtheta_rec)**p
          enddo
          sumw=sum(w)
       endif
       do i=1,num_interp
-         write(6,*)'loading seismogram for interpolation at theta=',real(count_neg+i-1)*dtheta_rec
+         write(*,*)'loading seismogram for interpolation at theta=',real(count_neg+i-1)*dtheta_rec
          if (usenetcdf) then
            call nc_read_seis(ncid_in, nc_disp_varid, count_neg+i, nt, seis_snglcomp)
          else
            call read_seis(dirname,count_neg+i,nt,seis_snglcomp)
-         end if  
+         endif
          call sum_individual_wavefields(seistmp,seis_snglcomp,nt,mij_phi)
 
-         if (trim(interp_method)=='sinc') then 
+         if (trim(interp_method) == 'sinc') then
             argu = pi*(theta_over_dtheta-real(count_neg+i))
             seis = seis + sin(argu)/argu*seistmp
 
-         elseif (interp_method=='idw') then  ! inverse distance weighting
+         else if (interp_method == 'idw') then  ! inverse distance weighting
             seis = seis + w(i)*seistmp
 
-         elseif (interp_method=='spline') then  ! linear splines
+         else if (interp_method == 'spline') then  ! linear splines
             seistmp = -(seistmp-seis)/dtheta_rec ! slope
             seis = seistmp* th_rec_rot(irec)*rad2deg + seis - seistmp*real(count_neg+i)*dtheta_rec
          endif
 
       enddo
-      if (interp_method=='idw') seis=seis/sumw
+      if (interp_method == 'idw') seis=seis/sumw
    endif
 
-! >>>>> sum, filter, rotate <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-   if (period>0.) then 
+! >>>>> sum, filter, rotate <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
+   if (period > 0.) then
       call convolve_with_stf(period,dt,nt,'gauss_0',seis,seis_snglcomp(:,:,1))
       seis = seis_snglcomp(:,:,1)
    endif
-   call rotate_receiver_comp(components,th_src,ph_src,&
+   call rotate_receiver_comp(components,th_src,ph_src, &
         th_rec_rot(irec),ph_rec_rot(irec),th_rec_rot(irec),ph_rec_rot(irec),nt,rot_mat,seis)
 
-! >>>>> save to file <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+! >>>>> save to file <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <  <
    open(unit=20,file=trim(recname(irec))//'_'//trim(interp_method)//'_filtperiod'//appidur//'_'//trim(reccomp(1))//'.ascii')
    open(unit=21,file=trim(recname(irec))//'_'//trim(interp_method)//'_filtperiod'//appidur//'_'//trim(reccomp(2))//'.ascii')
    open(unit=22,file=trim(recname(irec))//'_'//trim(interp_method)//'_filtperiod'//appidur//'_'//trim(reccomp(3))//'.ascii')
@@ -281,7 +281,7 @@ enddo ! nrec
 !--------------
 if (usenetcdf) call nc_close(ncid_in)
 
-write(6,*)' .... DONE.'
+write(*,*)' .... DONE.'
 
 !===========================
 end program find_receiver
@@ -296,18 +296,18 @@ implicit none
 character(len=3), intent(in)  :: rec_comp_sys
 character(len=1), intent(out) :: reccomp(3)
 
-  if (rec_comp_sys=='sph') then
+  if (rec_comp_sys == 'sph') then
      reccomp(1)='th'; reccomp(2)='ph'; reccomp(3)='r'
-  elseif (rec_comp_sys=='enz') then
+  else if (rec_comp_sys == 'enz') then
      reccomp(1)='N'; reccomp(2)='E'; reccomp(3)='Z'
-  elseif (rec_comp_sys=='cyl') then
+  else if (rec_comp_sys == 'cyl') then
      reccomp(1)='s'; reccomp(2)='ph'; reccomp(3)='z'
-  elseif (rec_comp_sys=='xyz') then
+  else if (rec_comp_sys == 'xyz') then
      reccomp(1)='x'; reccomp(2)='y'; reccomp(3)='z'
-  elseif (rec_comp_sys=='src') then
+  else if (rec_comp_sys == 'src') then
      reccomp(1)='R'; reccomp(2)='T'; reccomp(3)='Z'
   endif
-  
+
 end subroutine def_rec_comp
 !--------------------------------------------------------------------
 
@@ -322,7 +322,7 @@ integer                        :: it
 character(len=4)               :: ind_recchar
 
 call define_io_appendix(ind_recchar,ind_rec)!
-!write(6,*)'reading seismogram ',trim(dirname)//'/MZZ/Data/recfile_'//ind_recchar//'_disp.dat'
+!write(*,*)'reading seismogram ',trim(dirname)//'/MZZ/Data/recfile_'//ind_recchar//'_disp.dat'
 open(unit=60,file=trim(dirname)//'/MZZ/Data/recfile_'//ind_recchar//'_disp.dat')
 open(unit=61,file=trim(dirname)//'/MXX_P_MYY/Data/recfile_'//ind_recchar//'_disp.dat')
 open(unit=62,file=trim(dirname)//'/MXZ_MYZ/Data/recfile_'//ind_recchar//'_disp.dat')
@@ -333,7 +333,7 @@ do it=1,nt
    read(62,*)seis_snglcomp(it,1,3),seis_snglcomp(it,2,3),seis_snglcomp(it,3,3)
    read(63,*)seis_snglcomp(it,1,4),seis_snglcomp(it,2,4),seis_snglcomp(it,3,4)
 enddo
-close(60); close(61); close(62); close(63)  
+close(60); close(61); close(62); close(63)
 end subroutine read_seis
 !--------------------------------------------------------------------
 
@@ -369,19 +369,19 @@ do ircv=1,nrec
    x_vec_rot=matmul(trans_rot_mat,x_vec)
    r = sqrt(x_vec_rot(1)**2 + x_vec_rot(2)**2 + x_vec_rot(3)**2)
    costh_rec_rot = x_vec_rot(3) / (r +smallval)
-   if (costh_rec_rot.lt.-1.) costh_rec_rot = -1.
-   if (costh_rec_rot.gt.1.)  costh_rec_rot = 1.
+   if (costh_rec_rot < -1.) costh_rec_rot = -1.
+   if (costh_rec_rot > 1.)  costh_rec_rot = 1.
    th_rec_rot(ircv) = acos(costh_rec_rot)
 
    cosph_rec_rot = x_vec_rot(1) / (r * sin(th_rec_rot(ircv)) + smallval)
-   if (cosph_rec_rot.lt.-1.) cosph_rec_rot = -1.
-   if (cosph_rec_rot.gt.1.)  cosph_rec_rot = 1.
+   if (cosph_rec_rot < -1.) cosph_rec_rot = -1.
+   if (cosph_rec_rot > 1.)  cosph_rec_rot = 1.
 
    if (x_vec_rot(2) >= 0.) then
       ph_rec_rot(ircv) = acos(cosph_rec_rot)
    else
       ph_rec_rot(ircv) = 2.*pi - acos(cosph_rec_rot)
-   end if   
+   endif
 enddo
 
 end subroutine rotate_src_rec
@@ -401,7 +401,7 @@ mij_prefact(:,2) = 2.*(Mij(2)+Mij(3))
 mij_prefact(2,2) = 0.
 mij_prefact(:,3) =  Mij(4)*cos(phi)+Mij(5)*sin(phi)
 mij_prefact(2,3) = -Mij(4)*sin(phi)+Mij(5)*cos(phi)
-mij_prefact(:,4) = (Mij(2)-Mij(3))*cos(2.*phi)+2.*Mij(6)*sin(2.*phi) 
+mij_prefact(:,4) = (Mij(2)-Mij(3))*cos(2.*phi)+2.*Mij(6)*sin(2.*phi)
 mij_prefact(2,4) = (Mij(3)-Mij(2))*sin(2.*phi)+2.*Mij(6)*cos(2.*phi)
 
 end subroutine compute_radiation_prefactor
@@ -441,72 +441,72 @@ real                         :: seis_tmp(nt,3),seisvec(3)
 integer                      :: i
 real, parameter              :: pi = 3.14159265
 
-!write(6,*)'ROTATIONS'
-!write(6,*)th_orig*180./pi,ph_orig*180./pi
-!write(6,*)th_rot*180./pi,ph_rot*180./pi
+!write(*,*)'ROTATIONS'
+!write(*,*)th_orig*180./pi,ph_orig*180./pi
+!write(*,*)th_rot*180./pi,ph_rot*180./pi
 
 ! Need to consider *local* spherical geometry in the first place,
 ! THEN rotate the source-receiver frame to the north pole in the solver.
-! E.g., consider the difference between source-projected and spherical coordinates for a source 
-! away from the north pole: they are not the same, but in the framework below would 
+! E.g., consider the difference between source-projected and spherical coordinates for a source
+! away from the north pole: they are not the same, but in the framework below would
 ! be identified as the same.
 
 ! Source projected frame: transform to spherical without any further rotations
-if (rec_comp_sys=='src') then  
+if (rec_comp_sys == 'src') then
    seis_tmp(:,1) = cos(th_rot) * seis(:,1) - sin(th_rot) * seis(:,3)
    seis_tmp(:,2) = seis(:,2)
    seis_tmp(:,3) = sin(th_rot) * seis(:,1) + cos(th_rot) * seis(:,3)
 
-! Rotate from rotated u_sphiz to rotated u_xyz (both in reference, source-at-pole system) 
-else 
-   seis_tmp(:,1) = cos(ph_rot) * seis(:,1) - sin(ph_rot) * seis(:,2) 
+! Rotate from rotated u_sphiz to rotated u_xyz (both in reference, source-at-pole system)
+else
+   seis_tmp(:,1) = cos(ph_rot) * seis(:,1) - sin(ph_rot) * seis(:,2)
    seis_tmp(:,2) = sin(ph_rot) * seis(:,1) + cos(ph_rot) * seis(:,2)
    seis_tmp(:,3) = seis(:,3)
 
    ! Rotate to the original (i.e. real src-rec coordinate-based) u_xyz
-   if (srccolat>1.E-10 .or. srclon>1.E-10) then 
+   if (srccolat > 1.E-10 .or. srclon > 1.E-10) then
       do i=1,nt
          seisvec = seis_tmp(i,:)
          seis_tmp(i,:) = matmul(rot,seisvec)
       enddo
    endif
-endif 
+endif
 
 ! Rotate to coordinate system of choice
-if (rec_comp_sys=='enz') then
+if (rec_comp_sys == 'enz') then
    seis(:,1) = - cos(th_orig) * cos(ph_orig) * seis_tmp(:,1) &
              & - cos(th_orig) * sin(ph_orig) * seis_tmp(:,2) &
              & + sin(th_orig) * seis_tmp(:,3)
    seis(:,2) = - sin(ph_orig) * seis_tmp(:,1) &
              & + cos(ph_orig) * seis_tmp(:,2)
-   seis(:,3) =   sin(th_orig) * cos(ph_orig) * seis_tmp(:,1) & 
+   seis(:,3) =   sin(th_orig) * cos(ph_orig) * seis_tmp(:,1) &
              & + sin(th_orig) * sin(ph_orig) * seis_tmp(:,2) &
              & + cos(th_orig) * seis_tmp(:,3)
-   
 
-elseif (rec_comp_sys=='sph') then 
+
+else if (rec_comp_sys == 'sph') then
    seis(:,1) =   cos(th_orig) * cos(ph_orig) * seis_tmp(:,1) &
              & + cos(th_orig) * sin(ph_orig) * seis_tmp(:,2) &
              & - sin(th_orig) * seis_tmp(:,3)
-   seis(:,2) = - sin(ph_orig) * seis_tmp(:,1) & 
+   seis(:,2) = - sin(ph_orig) * seis_tmp(:,1) &
              & + cos(ph_orig) * seis_tmp(:,2)
-   seis(:,3) =   sin(th_orig) * cos(ph_orig) * seis_tmp(:,1) & 
+   seis(:,3) =   sin(th_orig) * cos(ph_orig) * seis_tmp(:,1) &
              & + sin(th_orig) * sin(ph_orig) * seis_tmp(:,2) &
              & + cos(th_orig) * seis_tmp(:,3)
 
-elseif (rec_comp_sys=='cyl') then 
+else if (rec_comp_sys == 'cyl') then
    seis(:,1) =   cos(ph_orig) * seis_tmp(:,1) + sin(ph_orig) * seis_tmp(:,2)
    seis(:,2) = - sin(ph_orig) * seis_tmp(:,1) + cos(ph_orig) * seis_tmp(:,2)
    seis(:,3) =   seis_tmp(:,3)
 
-elseif (rec_comp_sys=='xyz') then
+else if (rec_comp_sys == 'xyz') then
    seis = seis_tmp
 
-elseif (rec_comp_sys=='src') then
+else if (rec_comp_sys == 'src') then
    seis = seis_tmp ! taken from above
 
 else
-   write(6,*)'unknown component system',rec_comp_sys
+   write(*,*)'unknown component system',rec_comp_sys
    stop
 endif
 
@@ -514,7 +514,7 @@ end subroutine rotate_receiver_comp
 !--------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------
-subroutine convolve_with_stf(t_0,dt,nt,stf,seis,seis_fil)          
+subroutine convolve_with_stf(t_0,dt,nt,stf,seis,seis_fil)
 
 implicit none
 integer, intent(in)            :: nt
@@ -531,10 +531,10 @@ real, parameter                :: pi = 3.14159265
 real                           :: shiftfact
 
   shiftfact =  1.5*t_0
-!  write(6,*)
-!  write(6,*)'Convolving with period=',t_0
-!  write(6,*)'convolve:',stf,maxval(seis)
-!  write(6,*)'shift factor:',shiftfact
+!  write(*,*)
+!  write(*,*)'Convolving with period=',t_0
+!  write(*,*)'convolve:',stf,maxval(seis)
+!  write(*,*)'shift factor:',shiftfact
   N_j=int(3.*t_0/dt)
   call define_io_appendix(appidur,int(t_0))
   alpha=decay/t_0
@@ -543,8 +543,8 @@ real                           :: shiftfact
     seis_fil(i,:)=0.
     do j=1,N_j
        temp_expo=alpha*(real(j)*dt-shiftfact)
-       source = exp(-temp_expo**2 )*sqrt_pi_inv 
-       if(i > j .and. i-j <= nt) seis_fil(i,:) = seis_fil(i,:)+seis(i-j,:)*source
+       source = exp(-temp_expo**2 )*sqrt_pi_inv
+       if (i > j .and. i-j <= nt) seis_fil(i,:) = seis_fil(i,:)+seis(i-j,:)*source
     enddo
   enddo
   seis_fil=seis_fil*pi
@@ -575,52 +575,52 @@ character(len=2) :: comp(3)
 character(len=200) :: fname2
 real, parameter :: pi = 3.14159265
 
-write(6,*)'writing google earth kml file for plotting earthquake and receiver locations/seismograms...'
-write(6,*)'Check it out: googleearth_src_rec_seis.kml'
+write(*,*)'writing google earth kml file for plotting earthquake and receiver locations/seismograms...'
+write(*,*)'Check it out: googleearth_src_rec_seis.kml'
 
 slat=90.-srccolat1*180./pi
 slon=srclon1*180./pi
-if (slon>180.) slon=slon-360.
+if (slon > 180.) slon=slon-360.
 
 rlat=90.-rcvcolat*180./pi
 rlon=rcvlon*180./pi
 do i=1,num_rec_glob
-   if (rlon(i)>180.) rlon(i)=rlon(i)-360.
+   if (rlon(i) > 180.) rlon(i)=rlon(i)-360.
 enddo
 
 rlat_rot=90.-rcvcolat_rot*180./pi
 rlon_rot=rcvlon_rot*180./pi
 do i=1,num_rec_glob
-   if (rlon_rot(i)>180.) rlon_rot(i)=rlon_rot(i)-360.
+   if (rlon_rot(i) > 180.) rlon_rot(i)=rlon_rot(i)-360.
 enddo
 open(unit=88,file='googleearth_src_rec_seis.kml')
 
-write(88,14)'<?xml version="1.0" encoding="UTF-8"?> '
-write(88,15)'<kml xmlns="http://earth.google.com/kml/2.0"> '
-write(88,16)'<Document> '
+write(88,14)' < ?xml version="1.0" encoding="UTF-8"? > '
+write(88,15)' < kml xmlns="http://earth.google.com/kml/2.0" > '
+write(88,16)' < Document > '
 
 write(88,*)
-write(88,*)'  <name> earthquake-receiver configuration</name>'
-write(88,*)'    <LookAt>'
-write(88,12)'     <longitude>',slon,'</longitude><latitude>',slat,'</latitude>'
-write(88,*)'     <range>7000000</range><tilt>0</tilt><heading>0</heading>'
-write(88,*)'    </LookAt>'
+write(88,*)' < name > earthquake-receiver configuration < /name > '
+write(88,*)' < LookAt > '
+write(88,12)' < longitude > ',slon,' < /longitude > < latitude > ',slat,' < /latitude > '
+write(88,*)' < range > 7000000 < /range > < tilt > 0 < /tilt > < heading > 0 < /heading > '
+write(88,*)' < /LookAt > '
 write(88,*)
 write(88,*)'......'
-write(88,*)'  <Placemark>'
-write(88,*)'     <Style id="earthquake">'
-write(88,*)'       <IconStyle>'
- write(88,*)'       <scale>5</scale>'
-write(88,*)'         <Icon>'
-write(88,*)' <href>http://maps.google.com/mapfiles/kml/shapes/earthquake.png</href>'
-write(88,*)'             </Icon>'
-write(88,*)'           </IconStyle>'
-write(88,*)'                  <LabelStyle>'
-write(88,*)'                      <scale>5</scale>'
- write(88,*)'                 </LabelStyle>'
-write(88,*)'        </Style>'
-write(88,*)'    <name> earthquake</name>'
-write(88,*) ' <description> Event details:'
+write(88,*)' < Placemark > '
+write(88,*)' < Style id="earthquake" > '
+write(88,*)' < IconStyle > '
+ write(88,*)' < scale > 5 < /scale > '
+write(88,*)' < Icon > '
+write(88,*)' < href > http://maps.google.com/mapfiles/kml/shapes/earthquake.png < /href > '
+write(88,*)' < /Icon > '
+write(88,*)' < /IconStyle > '
+write(88,*)' < LabelStyle > '
+write(88,*)' < scale > 5 < /scale > '
+ write(88,*)' < /LabelStyle > '
+write(88,*)' < /Style > '
+write(88,*)' < name > earthquake < /name > '
+write(88,*) ' < description > Event details:'
 write(88,20) ' colat,lon [deg]:',srccolat1*180./pi,srclon1*180./pi
 write(88,21)' source depth [km]',srcdepth
 write(88,23)'Mrr=',Mij(1)
@@ -630,63 +630,63 @@ write(88,23)'Mtr=',Mij(4)
 write(88,23)'Mpr=',Mij(5)
 write(88,23)'Mtp=',Mij(6)
 write(88,21)'source period [s]:',per
-write(88,*)'</description>'
-write(88,13)'   <Point><coordinates>',slon,',',slat,'</coordinates></Point>'
-write(88,*)'   </Placemark>'
+write(88,*)' < /description > '
+write(88,13)' < Point > < coordinates > ',slon,',',slat,' < /coordinates > < /Point > '
+write(88,*)' < /Placemark > '
 
 do i=1,num_rec_glob
    write(88,*)
-   write(88,*) ' <Placemark>'
-   write(88,*) '     <Style id="cam">'
-   write(88,*) '       <IconStyle>'
- write(88,*)'       <scale>2</scale>'
-   write(88,*) '         <Icon>'
-      write(88,*) '<href>http://maps.google.com/mapfiles/kml/shapes/camera.png</href>'
-   write(88,*) '         </Icon>'
-   write(88,*) '       </IconStyle>'
-write(88,*)'                  <LabelStyle>'
-write(88,*)'                      <scale>2</scale>'
-write(88,*)'                 </LabelStyle>'
-   write(88,*) '     </Style>'
+   write(88,*) ' < Placemark > '
+   write(88,*) ' < Style id="cam" > '
+   write(88,*) ' < IconStyle > '
+ write(88,*)' < scale > 2 < /scale > '
+   write(88,*) ' < Icon > '
+      write(88,*) ' < href > http://maps.google.com/mapfiles/kml/shapes/camera.png < /href > '
+   write(88,*) ' < /Icon > '
+   write(88,*) ' < /IconStyle > '
+write(88,*)' < LabelStyle > '
+write(88,*)' < scale > 2 < /scale > '
+write(88,*)' < /LabelStyle > '
+   write(88,*) ' < /Style > '
 
    fname2=trim(receiver_name(i))//'_'//trim(interp_method)//'_filtperiod'//appidur//&
         '_['//reccomp(1)//reccomp(2)//reccomp(3)//'].ascii'
 
-   write(88,17) ' <name> ',trim(fname2),'  # ',i,'</name>'
+   write(88,17) ' < name > ',trim(fname2),'  # ',i,' < /name > '
    call define_io_appendix(app,i)
-   write(88,119) ' <description> rotated ',trim(fname2)
+   write(88,119) ' < description > rotated ',trim(fname2)
    write(88,20) ' colat,lon [deg]:',rcvcolat_rot(i)*180./pi,rcvlon_rot(i)*180./pi
 
-   write(88,*) '  </description>'
-   write(88,13) '   <Point><coordinates>',rlon_rot(i),',',rlat_rot(i),'</coordinates></Point>'
-   write(88,*) ' </Placemark>'
+   write(88,*) ' < /description > '
+   write(88,13) ' < Point > < coordinates > ',rlon_rot(i),',',rlat_rot(i),' < /coordinates > < /Point > '
+   write(88,*) ' < /Placemark > '
 
-   write(88,*) ' <Placemark>'
-   write(88,*) '     <Style id="cam">'
-   write(88,*) '       <IconStyle>'
- write(88,*)'       <scale>2</scale>'
-   write(88,*) '         <Icon>'
-      write(88,*)' <href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href>'
-   write(88,*) '         </Icon>'
-   write(88,*) '       </IconStyle>'
-write(88,*)'                  <LabelStyle>'
-write(88,*)'                      <scale>2</scale>'
-write(88,*)'                 </LabelStyle>'
-   write(88,*) '     </Style>'
-   write(88,17) ' <name> ',trim(fname2),'  # ',i,'</name>'
+   write(88,*) ' < Placemark > '
+   write(88,*) ' < Style id="cam" > '
+   write(88,*) ' < IconStyle > '
+ write(88,*)' < scale > 2 < /scale > '
+   write(88,*) ' < Icon > '
+      write(88,*)' < href > http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png < /href > '
+   write(88,*) ' < /Icon > '
+   write(88,*) ' < /IconStyle > '
+write(88,*)' < LabelStyle > '
+write(88,*)' < scale > 2 < /scale > '
+write(88,*)' < /LabelStyle > '
+   write(88,*) ' < /Style > '
+   write(88,17) ' < name > ',trim(fname2),'  # ',i,' < /name > '
    call define_io_appendix(app,i)
-   write(88,119) ' <description> original ',trim(fname2)
+   write(88,119) ' < description > original ',trim(fname2)
    write(88,20) ' colat,lon [deg]:',rcvcolat(i)*180./pi,rcvlon(i)*180./pi
-   write(88,*) '  </description>'
-   write(88,13) '   <Point><coordinates>',rlon(i),',',rlat(i),'</coordinates></Point>'
-   write(88,*) ' </Placemark>'
+   write(88,*) ' < /description > '
+   write(88,13) ' < Point > < coordinates > ',rlon(i),',',rlat(i),' < /coordinates > < /Point > '
+   write(88,*) ' < /Placemark > '
 
 enddo
 
 write(88,*)'......'
 write(88,*)
-write(88,*)'</Document>'
-write(88,*)'</kml>'
+write(88,*)' < /Document > '
+write(88,*)' < /kml > '
 
 close(88)
 
@@ -754,17 +754,17 @@ integer                         :: dirind,ndepths_chosen
     depth(1) = 100.; rundir(1) = '../PREM_40S_MIJ100KM_DIRAC_2000S_DB/ '
   !^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  case default 
-     write(6,*)'no simulation for model ',trim(model),' available'; stop
+  case default
+     write(*,*)'no simulation for model ',trim(model),' available'; stop
   end select
 
-  write(6,*) 'Rundir?'
+  write(*,*) 'Rundir?'
   read(*,*) rundirtemp
   dirind = minloc(abs(srcdepth-depth(1:ndepths_chosen)),1)
   chosen_dir = '../'//trim(rundirtemp)//'/'
-  write(6,*)'Background model: ',trim(model)
-  write(6,*)'Desired, offered depth [km]:',srcdepth,depth(dirind)
-  write(6,*)'Directory name: ',trim(chosen_dir)
+  write(*,*)'Background model: ',trim(model)
+  write(*,*)'Desired, offered depth [km]:',srcdepth,depth(dirind)
+  write(*,*)'Directory name: ',trim(chosen_dir)
 
 end subroutine depths
 !--------------------------------------------------------------------------

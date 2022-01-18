@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
@@ -43,19 +43,19 @@ subroutine define_global_global_numbering
 
   use data_time
   use clocks_mod
-  
+
   real(kind=dp)   , dimension(:), allocatable   :: sgtmp, zgtmp
   logical, dimension(:), allocatable            :: ifseg
   integer, dimension(:), allocatable            :: loc
   integer   :: npointot
 
-  ngllcube = (npol + 1)**2 
+  ngllcube = (npol + 1)**2
   npointot = neltot * (npol+1)**2
 
   if (dump_mesh_info_screen) then
-   write(6,*) 
-   write(6,*) 'NPOINTOT GLOBAL IS ' , npointot
-  end if
+   write(*,*)
+   write(*,*) 'NPOINTOT GLOBAL IS ' , npointot
+  endif
 
   allocate(sgtmp(npointot))
   sgtmp = pack(sgll, .true.)
@@ -79,17 +79,17 @@ subroutine define_global_global_numbering
   deallocate(sgtmp)
   deallocate(zgtmp)
 
-  if (dump_mesh_info_screen) write(6,*) 'NGLOBGLOB IS ' , NGLOBGLOB
+  if (dump_mesh_info_screen) write(*,*) 'NGLOBGLOB IS ' , NGLOBGLOB
 
 end subroutine define_global_global_numbering
 !-----------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------
 subroutine define_global_flobal_numbering
-  
+
   use data_time
   use clocks_mod
-  
+
   real(kind=dp)   , dimension(:), allocatable :: sgtmp,zgtmp
   integer, dimension(:), allocatable :: loc_fluid
   logical, dimension(:), allocatable ::   ifseg
@@ -97,10 +97,10 @@ subroutine define_global_flobal_numbering
 
   npointot = neltot_fluid * (npol+1)**2
 
-  if (dump_mesh_info_screen) then 
-     write(6,*) 
-     write(6,*) 'NPOINTOT FLOBAL IS ' , npointot
-  end if
+  if (dump_mesh_info_screen) then
+     write(*,*)
+     write(*,*) 'NPOINTOT FLOBAL IS ' , npointot
+  endif
 
   allocate(sgtmp(npointot))
   sgtmp = pack(sgll_fluid, .true.)
@@ -126,7 +126,7 @@ subroutine define_global_flobal_numbering
   deallocate(zgtmp)
   deallocate(sgtmp)
 
-  if (dump_mesh_info_screen) write(6,*) 'NGLOBFLOB IS ' , NGLOBFLOB
+  if (dump_mesh_info_screen) write(*,*) 'NGLOBFLOB IS ' , NGLOBFLOB
 
 end subroutine define_global_flobal_numbering
 !-----------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ subroutine define_global_slobal_numbering
 
   use data_time
   use clocks_mod
-  
+
   real(kind=dp)   , dimension(:), allocatable   :: sgtmp, zgtmp
   integer, dimension(:), allocatable            :: loc_solid
   logical, dimension(:), allocatable            :: ifseg
@@ -145,15 +145,15 @@ subroutine define_global_slobal_numbering
 
   npointot = neltot_solid * (npol+1)**2
 
-  if (dump_mesh_info_screen) then 
-     write(6,*) 
-     write(6,*) 'NPOINTOT SLOBAL IS ' , npointot
-  end if
+  if (dump_mesh_info_screen) then
+     write(*,*)
+     write(*,*) 'NPOINTOT SLOBAL IS ' , npointot
+  endif
 
   allocate(sgtmp(npointot))
   sgtmp = pack(sgll_solid, .true.)
-  deallocate(sgll_solid) ! not needed anymore 
-  
+  deallocate(sgll_solid) ! not needed anymore
+
   allocate(zgtmp(npointot))
   zgtmp = pack(zgll_solid, .true.)
   deallocate(zgll_solid) ! not needed anymore
@@ -174,7 +174,7 @@ subroutine define_global_slobal_numbering
   deallocate(zgtmp)
   deallocate(sgtmp)
 
-  if (dump_mesh_info_screen) write(6,*) 'NGLOBSLOB IS ' , NGLOBSLOB 
+  if (dump_mesh_info_screen) write(*,*) 'NGLOBSLOB IS ' , NGLOBSLOB
 
 end subroutine define_global_slobal_numbering
 !-----------------------------------------------------------------------------------------
@@ -207,8 +207,8 @@ subroutine get_global(nspec2, xp, yp, iglob2, loc2, ifseg2, nglob2, npointot2, &
 
   ! leave sorting subroutines in same source file to allow for inlining
 
-  use sorting,      only: mergesort_3
-  !$ use omp_lib     
+  use sorting, only: mergesort_3
+  !$ use omp_lib
 
   integer, intent(in)                :: nspec2, npointot2, NGLLCUBE2
   real(kind=dp)   , intent(inout)    :: xp(npointot2), yp(npointot2)
@@ -265,22 +265,23 @@ subroutine get_global(nspec2, xp, yp, iglob2, loc2, ifseg2, nglob2, npointot2, &
   ! count up number of different segments
   nseg = 0
   do i=1, npointot2
-     if(ifseg2(i)) then
+     if (ifseg2(i)) then
         nseg = nseg + 1
         ninseg(nseg) = 1
      else
         ninseg(nseg) = ninseg(nseg) + 1
      endif
+
   enddo
-  
+
   ! sort within each segment
   ioff = 1
 
   ioffs(1) = 1
   do iseg=2, nseg
      ioffs(iseg) = ioffs(iseg-1) + ninseg(iseg-1)
-  end do
-  
+  enddo
+
   !$ nthreads = min(min(omp_get_max_threads(),8), nmax_threads)
   !$ call omp_set_num_threads(nthreads)
   !$ print *, 'Using ', nthreads, ' threads for sorting in get_global!'
@@ -291,7 +292,7 @@ subroutine get_global(nspec2, xp, yp, iglob2, loc2, ifseg2, nglob2, npointot2, &
      call rank_y(yp(ioff), ind, ninseg(iseg))
      call swapall(loc2(ioff), xp(ioff), yp(ioff), ind, ninseg(iseg))
   enddo
-  !$omp end parallel do        
+  !$omp end parallel do
 
   ! check for jumps in current coordinate
   ! compare the coordinates of the points within a small tolerance
@@ -305,7 +306,7 @@ subroutine get_global(nspec2, xp, yp, iglob2, loc2, ifseg2, nglob2, npointot2, &
   ! assign global node numbers (now sorted lexicographically)
   ig = 0
   do i=1, npointot2
-     if(ifseg2(i)) ig = ig + 1
+     if (ifseg2(i)) ig = ig + 1
      iglob2(loc2(i)) = ig
   enddo
   nglob2 = ig
@@ -335,8 +336,8 @@ subroutine rank_y(A,IND,N)
 
   L=n/2+1
   ir=n
-100 CONTINUE
-  IF (l>1) THEN
+100 continue
+  if (l > 1) then
      l=l-1
      indx=ind(l)
      q=a(indx)
@@ -350,23 +351,23 @@ subroutine rank_y(A,IND,N)
 
         return
      endif
-  ENDIF
+  endif
   i=l
   j=l+l
-200 CONTINUE
-  IF (J <= IR) THEN
-     IF (J<IR) THEN
-        IF ( A(IND(j))<A(IND(j+1)) ) j=j+1
-     ENDIF
-     IF (q<A(IND(j))) THEN
+200 continue
+  if (J <= IR) then
+     if (J < IR) then
+        if ( A(IND(j)) < A(IND(j+1)) ) j=j+1
+     endif
+     if (q < A(IND(j))) then
         IND(I)=IND(J)
         I=J
         J=J+J
      ELSE
         J=IR+1
-     ENDIF
+     endif
      goto 200
-  ENDIF
+  endif
   IND(I)=INDX
   goto 100
 

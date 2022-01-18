@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
 module data_pdb
 
-  use global_parameters, only                : sp, dp
+  use global_parameters, only: sp, dp
   implicit none
   public
 
@@ -39,7 +39,7 @@ module data_pdb
   integer, dimension(:), allocatable        :: nbelong
   integer, dimension(:), allocatable        :: nprocb
   integer, dimension(:,:), allocatable      :: lprocb
-  integer, dimension(:), allocatable        :: el2proc 
+  integer, dimension(:), allocatable        :: el2proc
 
   ! Glocal message passing...redundant eventually!
   integer, dimension(:), allocatable        :: sizerecvp, sizesendp
@@ -95,6 +95,9 @@ module data_pdb
   logical, dimension(:,:), allocatable       :: coarsingp
 
   real(kind=dp), dimension(:), allocatable   :: theta_min_proc, theta_max_proc
+
+  ! global to glocal mapping
+  integer, dimension(:,:), allocatable       :: glob2gloc
 
 end module data_pdb
 !=========================================================================================

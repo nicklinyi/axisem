@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
@@ -134,8 +134,8 @@ subroutine append(this, ldata)
      call newLink%init(ldata, null(), this%lastLink)
      call this%lastLink%setNextLink(newLink)
      this%lastLink => newLink
-  end if
-   
+  endif
+
   this%length = this%length + 1
 end subroutine append
 !-----------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ subroutine insert(this, ldata)
   type(link), pointer     :: newLink
 
   allocate(newLink)
-  
+
   if (.not. associated(this%firstLink)) then
      call newLink%init(ldata, null(), null())
      this%firstLink => newLink
@@ -156,7 +156,7 @@ subroutine insert(this, ldata)
      call newLink%init(ldata, this%firstLink, null())
      call this%firstLink%setPrevLink(newLink)
      this%firstLink => newLink
-  end if
+  endif
 
   this%length = this%length + 1
 end subroutine insert
@@ -167,7 +167,7 @@ function getFirst(this)
   class(list)           :: this
   class(link),pointer   :: getFirst
 
-  if(associated(this%firstLink)) then
+  if (associated(this%firstLink)) then
      getFirst => this%firstLink
      this%currentLink => this%firstLink
   else
@@ -181,7 +181,7 @@ function getLast(this)
   class(list)           :: this
   class(link),pointer   :: getLast
 
-  if(associated(this%lastLink)) then
+  if (associated(this%lastLink)) then
      getLast => this%lastLink
      this%currentLink => this%lastLink
   else
@@ -196,7 +196,7 @@ function getCurrent(this)
   class(link),pointer   :: getCurrent
 
   if (.not. associated(this%currentLink)) then
-     if(associated(this%firstLink)) then
+     if (associated(this%firstLink)) then
         this%currentLink => this%firstLink
      else
         stop 'trying to go access data, but list is empty'
@@ -221,12 +221,12 @@ function getNext(this)
   if (.not. associated(this%currentLink)) then
      this%currentLink => this%firstLink
      getNext => this%currentLink
-  elseif (associated(this%currentLink%getNextLink())) then
+  else if (associated(this%currentLink%getNextLink())) then
      this%currentLink => this%currentLink%getNextLink()
      getNext => this%currentLink
   else
      stop 'trying to go beyond last element in list'
-  end if 
+  endif
 end function getNext
 !-----------------------------------------------------------------------------------------
 
@@ -238,12 +238,12 @@ function getPrev(this)
   if (.not. associated(this%currentLink)) then
      this%currentLink => this%lastLink
      getPrev => this%currentLink
-  elseif (associated(this%currentLink%getPrevLink())) then
+  else if (associated(this%currentLink%getPrevLink())) then
      this%currentLink => this%currentLink%getPrevLink()
      getPrev => this%currentLink
   else
      stop 'trying to go beyond first element in list'
-  end if 
+  endif
 end function getPrev
 !-----------------------------------------------------------------------------------------
 
@@ -276,7 +276,7 @@ subroutine free(this)
   class(list)               :: this
   class(link), pointer      :: current, next
 
-  if(associated(this%firstLink)) then
+  if (associated(this%firstLink)) then
      next => this%firstLink
      do while ( associated(next) )
         current => next

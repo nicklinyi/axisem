@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,24 +16,24 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
-!> This module is only known during the time loop if the strain tensor 
-!! is computed on-the-fly. The fluid section is additionally known if global 
+!> This module is only known during the time loop if the strain tensor
+!! is computed on-the-fly. The fluid section is additionally known if global
 !! snapshots are dumped (to compute the displacement in the fluid).
  module data_pointwise
-  
+
   use global_parameters, only: realkind
-  
+
   implicit none
-  public 
-  
+  public
+
   !+++++++++++++++++++++++++++++++++++++++++++++++++++
   !  Precomputed matrices for pointwise derivatives
   !+++++++++++++++++++++++++++++++++++++++++++++++++++
-  
+
   !> Inverse density in fluid - only needed when computing pointwise displacement
   real(kind=realkind), allocatable :: inv_rho_fluid(:,:,:)
 

@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,28 +16,28 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
 module analytic_mapping
-  
-  use analytic_spheroid_mapping, only: map_spheroid
-  use analytic_semi_mapping,     only: map_semiso, map_semino
-  use subpar_mapping,            only: mapping_subpar
-  use data_mesh,                 only: eltypeg, dp
+
+  use analytic_spheroid_mapping
+  use analytic_semi_mapping
+  use subpar_mapping
+  use data_mesh
 
   implicit none
 
   public :: mapping_anal
- 
+
   private
 
 contains
 
 !-----------------------------------------------------------------------------------------
 real(kind=dp)    function mapping_anal(xi,eta,nodes_crd,iaxis,ielem0)
-  
+
   integer           :: iaxis,ielem0
   real(kind=dp)     :: xi, eta, nodes_crd(8,2)
   if (eltypeg(ielem0) == 'curved') mapping_anal = map_spheroid(xi,eta,nodes_crd,iaxis)

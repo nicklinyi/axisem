@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,16 +16,16 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
-module subpar_mapping  
-!< Module used to compute the subparametric mapping that defines the mesh. 
+module subpar_mapping
+! < Module used to compute the subparametric mapping that defines the mesh.
 
   use global_parameters
 
-  implicit none 
+  implicit none
 
   public :: mapping_subpar
   public :: compute_partial_d_subpar
@@ -35,7 +35,7 @@ contains
 
 !-----------------------------------------------------------------------------------------
 pure real(kind=dp) function mapping_subpar(xil,etal,nodes_crd,iaxis)
-!< This routines computes the coordinates along the iaxis axis of the image of
+! < This routines computes the coordinates along the iaxis axis of the image of
 !! any point in the reference domain in the physical domain.
 !
 ! 7 - - - 6 - - - 5
@@ -50,7 +50,7 @@ pure real(kind=dp) function mapping_subpar(xil,etal,nodes_crd,iaxis)
 !
 ! iaxis = 1 : along the cylindrical radius axis
 ! iaxis = 2 : along the vertical(rotation) axis
-  
+
   integer, intent(in)       :: iaxis
   real(kind=dp), intent(in) :: xil, etal, nodes_crd(8,2)
   integer                   :: inode
@@ -60,12 +60,12 @@ pure real(kind=dp) function mapping_subpar(xil,etal,nodes_crd,iaxis)
   ! functions
 
   call shp8(xil,etal,shp)
-  
+
   mapping_subpar = zero
 
   do inode = 1, 8
      mapping_subpar = mapping_subpar + shp(inode)*nodes_crd(inode,iaxis)
-  end do
+  enddo
 
 end function mapping_subpar
 !-----------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ pure subroutine compute_partial_d_subpar(dsdxi, dzdxi, dsdeta, dzdeta, xil, etal
      dzdeta = dzdeta + nodes_crd(inode,2)*shpder(inode,2)
      dsdeta = dsdeta + nodes_crd(inode,1)*shpder(inode,2)
      dzdxi  =  dzdxi + nodes_crd(inode,2)*shpder(inode,1)
-  end do
+  enddo
 
 end subroutine compute_partial_d_subpar
 !-----------------------------------------------------------------------------------------
@@ -97,11 +97,11 @@ end subroutine compute_partial_d_subpar
 !-----------------------------------------------------------------------------------------
 pure subroutine shp8(xil,etal,shp)
 !
-!< This routine computes and returns the quadratic
+! < This routine computes and returns the quadratic
 !! shape functions axixiociated with a 8-nodes serendip
 !! element for a given point of coordinates (xi,eta).
 !
-! Topology is defined as follows 
+! Topology is defined as follows
 !
 ! 7 - - - 6 - - - 5
 ! |       ^       |
@@ -122,11 +122,11 @@ pure subroutine shp8(xil,etal,shp)
 
 
   xip    = one +  xil
-  xim    = one -  xil 
+  xim    = one -  xil
   etap   = one + etal
   etam   = one - etal
-  xixi   =  xil *  xil 
-  etaeta = etal * etal 
+  xixi   =  xil *  xil
+  etaeta = etal * etal
 
   ! Corners first:
   shp(1) = quart * xim * etam * (xim + etam - three)
@@ -138,7 +138,7 @@ pure subroutine shp8(xil,etal,shp)
   shp(2) = half  * etam * (one -   xixi)
   shp(4) = half  *  xip * (one - etaeta)
   shp(6) = half  * etap * (one -   xixi)
-  shp(8) = half  *  xim * (one - etaeta)      
+  shp(8) = half  *  xim * (one - etaeta)
 
 end subroutine shp8
 !-----------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ end subroutine shp8
 !-----------------------------------------------------------------------------------------
 pure subroutine shp8der(xil,etal,shpder)
 !
-!< This routine computes and returns the derivatives
+! < This routine computes and returns the derivatives
 !! of the shape functions axixiociated with a 8-nodes serendip
 !! element for a given point of coordinates (xi,eta).
 !! shpder(:,1) : derivative wrt xi
@@ -169,16 +169,16 @@ pure subroutine shp8der(xil,etal,shpder)
   real(kind=dp), intent(in)  :: xil, etal
   real(kind=dp), intent(out) :: shpder(8,2)
   real(kind=dp)              :: xip, xim, etap, etam, xixi, etaeta
- 
+
   shpder(:,:) = zero
- 
+
   xip    = one +  xil
   xim    = one -  xil
   etap   = one + etal
   etam   = one - etal
   xixi   =  xil *  xil
   etaeta = etal * etal
- 
+
   ! Corners first:
   shpder(1,1) = -quart * etam * ( xim + xim + etam - three)
   shpder(1,2) = -quart *  xim * (etam + xim + etam - three)

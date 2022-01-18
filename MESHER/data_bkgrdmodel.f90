@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
 module data_bkgrdmodel
 
-  use global_parameters, only : dp, sp, pi
+  use global_parameters, only: dp, sp
   implicit none
 
   integer                    :: ndisc, nfluidregions
@@ -34,11 +34,10 @@ module data_bkgrdmodel
   character(len=100)         :: bkgrdmodel
   logical                    :: have_fluid, have_solid
   real(kind=dp)              :: pts_wavelngth
-  real(kind=dp)              :: period, courant, local_max_colat, local_lat_fac
-  real(kind=dp)              :: max_depth
+  real(kind=dp)              :: period, courant
   real(kind=dp)              :: dt
   integer                    :: nc_init, nthetaslices, nradialslices
-  
+
   ! the sole quantities to be created in create_subregions
   ! that are needed by the rest of the mesher
   integer                    :: nz_glob, ns_glob, nc_glob
@@ -49,7 +48,6 @@ module data_bkgrdmodel
 
   ! The following variables are only needed by external models
   character(len=100)         :: fnam_ext_model
-  character(len=100)         :: model_name_ext_model = ''
 
 end module data_bkgrdmodel
 !=========================================================================================

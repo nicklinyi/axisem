@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 !
 !    This file contains a robust implementation of linear interpolation.
@@ -77,7 +77,7 @@ function interpolation_object( x, y, extrapolation )
         print *, 'ERROR: interpolation_object: Not enough data'
         print *, 'X: ', x
         print *, 'Y: ', y
-        stop
+        return
     endif
 
     ! Data sorted?
@@ -87,11 +87,11 @@ function interpolation_object( x, y, extrapolation )
         if ( x(i) > x(i-1) ) then
             print *, 'ERROR: interpolation_object: data not sorted'
             success = .false.
-            stop
+            exit
         endif
     enddo
 
-    if ( .not. success ) then
+    if (.not. success ) then
         return
     endif
 
@@ -131,7 +131,7 @@ subroutine interpolate( object, xp, estimate, success )
     estimate = 0.0
     success  = .false.
 
-    if ( .not. object%useable ) then
+    if (.not. object%useable ) then
         print *, 'Unusable interpolation object'
         return
     endif
@@ -144,12 +144,12 @@ subroutine interpolate( object, xp, estimate, success )
            print *, 'interpolation: x out of range (too large) and no extrapolation chosen'
            print *, 'xp:', xp, ', x(1): ', object%x(1)
            return
-        end if
+        endif
         if ( xp < object%x(nd)*(1-eps) ) then
            print *, 'interpolation: x out of range (too small) and no extrapolation chosen'
            print *, 'xp:', xp, ', x(nd): ', object%x(nd)
            return
-        end if
+        endif
     endif
     if ( object%extrapolation == extrapolation_constant ) then
         if ( xp > object%x(1)  ) then

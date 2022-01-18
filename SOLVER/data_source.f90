@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
@@ -34,21 +34,20 @@ module data_source
   real(kind=dp)                    :: src_depth, zsrc, srccolat, srclon
   integer                          :: iel_src, ipol_src, jpol_src
   integer                          :: isim
-  logical                          :: have_src, fluid_src
+  logical                          :: have_src
   real(kind=realkind), allocatable :: stf(:)
   logical                          :: rot_src
   real(kind=realkind)              :: Mij(6)
 
   ! discrete diracs
   real(kind=realkind)              :: sampling_per_a, discrete_dirac_halfwidth
-  integer                          :: period_vs_discrete_halfwidth, it_src_shift 
+  integer                          :: period_vs_discrete_halfwidth, it_src_shift
   real(kind=realkind)              :: dt_src_shift, shift_fact_discrete_dirac
   character(len=6)                 :: discrete_choice
   logical                          :: discrete_dirac
 
   ! elemental source term, maximally across 8 elements and 3 components
   real(kind=realkind), allocatable :: source_term_el(:,:,:,:)
-  real(kind=realkind), allocatable :: source_term_fl(:,:,:)
   integer                          :: nelsrc, ielsrc(8)
 
   ! How to deal with the source for kernel wavefield dumps

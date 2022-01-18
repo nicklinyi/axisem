@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 !=========================================================================================
 !> Module to do the SOLVER-specific initialization of the clocks module
@@ -34,19 +34,19 @@ contains
 !> Driver routine to start the timing, using the clocks_mod module.
 subroutine start_clock
 
-  use clocks_mod, only : clocks_init, clock_id
-  use data_time,  only : idcomm, iddump, idmpi, idmpiws, idmpiwf, idnbio, idold, &
+  use clocks_mod, only: clocks_init, clock_id
+  use data_time, only: idcomm, iddump, idmpi, idmpiws, idmpiwf, idnbio, idold, &
                          idstiff, idanelts, idanelst
-  use data_proc,  only : lpr, mynum
-  use data_io,    only : verbose
-  
+  use data_proc, only: lpr, mynum
+  use data_io, only: verbose
+
   implicit none
-  
+
   character(len=8)  :: mydate
   character(len=10) :: mytime
 
-  call date_and_time(mydate,mytime) 
-  if (lpr) write(6,11) mydate(5:6), mydate(7:8), mydate(1:4), mytime(1:2), mytime(3:4)
+  call date_and_time(mydate,mytime)
+  if (lpr) write(*,11) mydate(5:6), mydate(7:8), mydate(1:4), mytime(1:2), mytime(3:4)
 
 11 format('     Simulation started on ', A2,'/',A2,'/',A4,' at ', A2,'h ',A2,'min',/)
 
@@ -75,22 +75,22 @@ end subroutine start_clock
 
 !-----------------------------------------------------------------------------------------
 !> Wapper routine to end timing and display clock informations.
-subroutine end_clock 
+subroutine end_clock
 
-  use clocks_mod, only : clocks_exit
-  use data_proc,  only : mynum
+  use clocks_mod, only: clocks_exit
+  use data_proc, only: mynum
 
   implicit none
 
-  if (mynum==0) then
-     write(6,*)
-     write(6,"(10x,'Summary of timing measurements:')")
-     write(6,*)
+  if (mynum == 0) then
+     write(*,*)
+     write(*,"(10x,'Summary of timing measurements:')")
+     write(*,*)
   endif
 
   call clocks_exit(mynum)
 
-  if (mynum==0) write(6,*)
+  if (mynum == 0) write(*,*)
 
 end subroutine end_clock
 !-----------------------------------------------------------------------------------------

@@ -1,9 +1,9 @@
 !
 !    Copyright 2013, Tarje Nissen-Meyer, Alexandre Fournier, Martin van Driel
-!                    Simon Stähler, Kasra Hosseini, Stefanie Hempel
+!                    Simon Stahler, Kasra Hosseini, Stefanie Hempel
 !
 !    This file is part of AxiSEM.
-!    It is distributed from the webpage <http://www.axisem.info>
+!    It is distributed from the webpage < http://www.axisem.info>
 !
 !    AxiSEM is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 !    GNU General Public License for more details.
 !
 !    You should have received a copy of the GNU General Public License
-!    along with AxiSEM.  If not, see <http://www.gnu.org/licenses/>.
+!    along with AxiSEM.  If not, see < http://www.gnu.org/licenses/>.
 !
 
 !=========================================================================================
@@ -29,9 +29,9 @@ module source
   use data_proc
   use data_io
   use commun, only: pcheck
-  
+
   implicit none
-  
+
   public :: compute_stf, compute_stf_t, compute_src, read_sourceparams
   private
 contains
@@ -39,15 +39,15 @@ contains
 !-----------------------------------------------------------------------------------------
 subroutine read_sourceparams
 
-  use utlity, only       : to_lower
- 
+  use utlity, only: to_lower
+
   real(kind=realkind)   :: srclat
   character(len=256)    :: keyword, keyvalue, line
   character(len=512)    :: errmsg
   integer               :: iinparam_source=500, ioerr
- 
-  
-  if (verbose > 1.and.lpr) write(6,'(A)', advance='no') '    Reading inparam_source...'
+
+
+  if (verbose > 1 .and. lpr) write(*,'(A)', advance='no') '    Reading inparam_source...'
   open(unit=iinparam_source, file='inparam_source', status='old', action='read',  iostat=ioerr)
   call pcheck(ioerr /= 0, 'Check input file ''inparam_source''! Is it still there?')
 
@@ -56,11 +56,11 @@ subroutine read_sourceparams
     if (ioerr < 0) exit
     if (len(trim(line)) < 1 .or. line(1:1) == '#') cycle
 
-    read(line,*) keyword, keyvalue 
-  
+    read(line,*) keyword, keyvalue
+
     parameter_to_read : select case(trim(keyword))
-    
-    case('SOURCE_TYPE') 
+
+    case('SOURCE_TYPE')
         read(keyvalue, *) src_type(2)
         src_type(2) = to_lower(src_type(2))
         select case(src_type(2))
@@ -76,21 +76,21 @@ subroutine read_sourceparams
                  '              mtr, mpr, thetaforce, phiforce        (dipole)\n', &
                  '              mtp, mtt_m_mpp                        (quadpole)\n'
             call pcheck(.true., errmsg)
-            
+
         end select
 
     case('SOURCE_DEPTH')
-        read(keyvalue,*) src_depth 
+        read(keyvalue,*) src_depth
         src_depth = src_depth * 1000 ! The solver works in meters
 
     case('SOURCE_LAT')
         read(keyvalue,*) srclat
         srccolat = 90.0 - srclat
-        srccolat = srccolat * pi / 180.d0 
+        srccolat = srccolat * pi / 180.d0
 
     case('SOURCE_LON')
         read(keyvalue,*) srclon
-        srclon = srclon * pi / 180.d0 
+        srclon = srclon * pi / 180.d0
 
     case('SOURCE_AMPLITUDE')
         read(keyvalue,*) magnitude
@@ -102,33 +102,33 @@ subroutine read_sourceparams
 
   if (srccolat /= 0.d0 .or. srclon /= 0.d0 ) then
      if (lpr .and. verbose > 0) &
-        write(6,'(/,a,a,/,a,a)')&
+        write(*,'(/,a,a,/,a,a)')&
             procstrg, '  Source not along the axis!', &
             procstrg,'  ...therefore applying rotations to source and receivers.'
      rot_src = .true.
 
-     if (rec_file_type.eq.'database') then
+     if (rec_file_type == 'database') then
        write(errmsg,'(a,/,a)') &
           'For the database function, the source should be at the northpole.', &
           'All rotation is done in postprocessing.'
        call pcheck(.true., errmsg)
-     end if
+     endif
   else
      rot_src = .false.
   endif
 
   if (lpr .and. verbose > 0) then
-     write(6,*)  ''
-     write(6,*)  '  *****************GIVEN SOURCE PARAMETERS*****************'
-     write(6,11) '   Magnitude [Nm]:       ', magnitude
-     write(6,13) '   Excitation type:      ', src_type(1),src_type(2)
-     write(6,11) '   Depth [km]:           ', src_depth/1000.
-     write(6,11) '   Colat. [deg]:         ', real(srccolat*180./pi)
-     write(6,11) '   Long. [deg]:          ', real(srclon*180./pi)
-     write(6,14) '   Source time function: ', stf_type
-     write(6,12) '   Dom. period mesh [s]: ', period
-     write(6,*)  '  *********************************************************'
-     write(6,*)  ''
+     print *
+     write(*,*)  '  *****************GIVEN SOURCE PARAMETERS*****************'
+     write(*,11) '   Magnitude [Nm]:       ', magnitude
+     write(*,13) '   Excitation type:      ', src_type(1),src_type(2)
+     write(*,11) '   Depth [km]:           ', src_depth/1000.
+     write(*,11) '   Colat. [deg]:         ', real(srccolat*180./pi)
+     write(*,11) '   Long. [deg]:          ', real(srclon*180./pi)
+     write(*,14) '   Source time function: ', stf_type
+     write(*,12) '   Dom. period mesh [s]: ', period
+     write(*,*)  '  *********************************************************'
+     print *
      call flush(6)
   endif
 
@@ -142,7 +142,7 @@ end subroutine read_sourceparams
 
 !-----------------------------------------------------------------------------------------
 subroutine compute_stf
-  use nc_routines, only   : nc_dump_stf
+  use nc_routines, only: nc_dump_stf
   character(len=512)     :: errmsg
   integer                :: i
 
@@ -153,7 +153,7 @@ subroutine compute_stf
   case('dirac_0')
     call delta_src ! discrete Dirac's
   case('dirac_1')
-    call delta_src 
+    call delta_src
   case('gauss_0')
     call gauss
   case('gauss_1')
@@ -176,15 +176,15 @@ subroutine compute_stf
   write(errmsg, *) & !'(a,/,a,2(f7.4))') &
                 'Problem with discrete source shift: not a multiplicative of deltat...', &
                 'source shift, deltat: ', dt_src_shift, deltat !, dt_src_shift/deltat
-  call pcheck(abs(nint(dt_src_shift / deltat) - dt_src_shift / deltat) > deltat, errmsg)
+  call pcheck(abs(nint(dt_src_shift / deltat) - dt_src_shift / deltat) > 0.01 * deltat, errmsg)
 
   ! time shift in the Fourier domain (used in post processing/kerner... eventually)
   ! timeshift_fourier(0:nomega) = exp(cmplx(0.,1.) *omega(0:nomega)*dt_src_shift)
 
-   if (use_netcdf.and.(mynum.eq.0)) call nc_dump_stf(stf(1:niter))
+   if (use_netcdf .and. (mynum == 0)) call nc_dump_stf(stf(1:niter))
 
    if (lpr) then
-      if(.not.(use_netcdf)) then
+      if (.not. (use_netcdf)) then
           open(299, file=datapath(1:lfdata)//'/stf.dat', status='replace', action='write')
           open(298, file=datapath(1:lfdata)//'/stf_seis.dat', status='replace', action='write')
           open(297, file=datapath(1:lfdata)//'/stf_strain.dat', status='replace', action='write')
@@ -196,17 +196,17 @@ subroutine compute_stf
           close(299)
           close(298)
           close(297)
-      end if
-   end if
+      endif
+   endif
 
 end subroutine compute_stf
 !-----------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------
-!> These *_t routines are needed by the symplectic time integration schemes. 
+!> These *_t routines are needed by the symplectic time integration schemes.
 !! Eventually there should be only one type, point- or array-wise.
 subroutine compute_stf_t(nstf_t,t,stf_t)
-  
+
   integer, intent(in)        :: nstf_t
   real(kind=dp), intent(in)  :: t(1:nstf_t)
   real(kind=dp), intent(out) :: stf_t(1:nstf_t)
@@ -226,7 +226,7 @@ subroutine compute_stf_t(nstf_t,t,stf_t)
   case('quheavi')
     call quasiheavi_t(nstf_t, stf_t)
   case default
-     write(6,*)' source time function non existant:', stf_type
+     write(*,*)' source time function non existant:', stf_type
      stop
   end select
 
@@ -239,7 +239,7 @@ subroutine compute_src
   use data_mesh
   use utlity
   use commun, only: broadcast_int,broadcast_dble
-  
+
   integer                          :: iel_src2,ipol_src2,jpol_src2
   real(kind=realkind), allocatable :: source_term(:,:,:,:)
   real(kind=realkind), allocatable :: point_source(:,:,:)
@@ -247,112 +247,92 @@ subroutine compute_src
   real(kind=dp)                    :: s,z,r,theta
   character(len=256)               :: errmsg
 
+  allocate(source_term(0:npol,0:npol,1:nel_solid,1:3))
+  source_term = 0.
 
   zsrc = router - src_depth
 
-  if (lpr) write(6,'(a,/,a,/,a,/,a)') &
+  if (lpr) write(*,'(a,/,a,/,a,/,a)') &
             '  *****************************************', &
             '     Welcome to the source term calculator ', &
             '  *****************************************', &
             '  locating the source....'
-  
+
   if (verbose > 1) write(69,'(/,a)')'    L O O K I N G   F O R   T H E   S O U R C E '
 
   call find_srcloc(iel_src2, ipol_src2, jpol_src2)
 
   ! @TODO: should add a test whether it is the first theta slice
 
-  if (fluid_src) then
-     ! Only explosion sources are implemented in the fluid so far      
-     if (src_type(2).ne.'explosion') then
-        write(6,*) 'only explosions in the fluid'
-        stop
-     end if
-         
-     allocate(source_term(0:npol,0:npol,1:nel_fluid,1:3))
-     source_term = 0. 
+  poletype: select case(src_type(1))
 
-     if (lpr) write(6,*) '  ...explosion in the fluid'
-     allocate(point_source(0:npol,0:npol,1:nel_fluid))
+  ! MONOPOLE
+  case ('monopole') poletype
+     if (lpr) write(*,*) '  computing MONOPOLE Source with...'
 
-     call define_bodyforce(point_source,iel_src2,ipol_src2,jpol_src2)
-     source_term(:,:,:,1) = point_source / (two * pi)
-     deallocate(point_source)
-  else
-     allocate(source_term(0:npol,0:npol,1:nel_solid,1:3))
-     source_term = 0. 
-
-     poletype: select case(src_type(1))
-
-     ! MONOPOLE
-     case ('monopole') poletype
-        if (lpr) write(6,*) '  computing MONOPOLE Source with...'
-
-        select case (src_type(2))
-        case('vertforce') 
-           if (lpr) write(6,*) '  ...vertical single force'
-           allocate(point_source(0:npol,0:npol,1:nel_solid))
-           call define_bodyforce(point_source,iel_src2,ipol_src2,jpol_src2)
-           source_term(:,:,:,3) = point_source / (two * pi)
-           deallocate(point_source)
-
-        case default
-           if (lpr) write(6,*) '  ...moment tensor elements for ', src_type(2)
-           call define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
-           source_term = source_term / (2 * pi)
-
-        end select
-
-     ! DIPOLE
-     case ('dipole') poletype
-        if (lpr) write(6,*) '  computing DIPOLE Source with...'
-
-        select case(src_type(2))
-        case ('thetaforce', 'phiforce')
-           if (lpr) write(6,*) '  ...horizontal single ', src_type(2)
-           allocate(point_source(0:npol,0:npol,1:nel_solid))
-           call define_bodyforce(point_source, iel_src2, ipol_src2, jpol_src2)
-           source_term(:,:,:,1) = point_source / pi
-           deallocate(point_source)
-
-        case default
-           if (lpr) write(6,*) '  ...moment tensor elements for ', src_type(2)
-           call define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
-           source_term = source_term / pi
-
-        end select
-
-     ! QUADRUPOLE
-     case ('quadpole') poletype
-        if (lpr) write(6,*)'  computing QUADRUPOLE Source with...'
-        if (lpr) write(6,*)'  ...moment tensor elements for ',src_type(2)
-        call define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
-        source_term = source_term / (2 * pi)
+     select case (src_type(2))
+     case('vertforce')
+        if (lpr) write(*,*) '  ...vertical single force'
+        allocate(point_source(0:npol,0:npol,1:nel_solid))
+        call define_bodyforce(point_source,iel_src2,ipol_src2,jpol_src2)
+        source_term(:,:,:,3) = point_source / (two * pi)
+        deallocate(point_source)
 
      case default
-        write(errmsg,*) 'we only support monopoles, dipoles, quadrupoles, and not ',src_type(1)
-        ! Will stop the program
-        call pcheck(.true., errmsg) 
+        if (lpr) write(*,*) '  ...moment tensor elements for ', src_type(2)
+        call define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
+        source_term = source_term / (two * pi)
 
-     end select poletype
+     end select
 
-  endif
+  ! DIPOLE
+  case ('dipole') poletype
+     if (lpr) write(*,*) '  computing DIPOLE Source with...'
+
+     select case(src_type(2))
+     case ('thetaforce', 'phiforce')
+        if (lpr) write(*,*) '  ...horizontal single ', src_type(2)
+        allocate(point_source(0:npol,0:npol,1:nel_solid))
+        call define_bodyforce(point_source, iel_src2, ipol_src2, jpol_src2)
+        source_term(:,:,:,1) = point_source / pi
+        deallocate(point_source)
+
+     case default
+        if (lpr) write(*,*) '  ...moment tensor elements for ', src_type(2)
+        call define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
+        source_term = source_term / pi
+
+     end select
+
+  ! QUADRUPOLE
+  case ('quadpole') poletype
+     if (lpr) write(*,*)'  computing QUADRUPOLE Source with...'
+     if (lpr) write(*,*)'  ...moment tensor elements for ',src_type(2)
+     call define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
+     source_term = source_term / pi
+
+  case default
+     write(errmsg,*) 'we only support monopoles, dipoles, quadrupoles, and not ',src_type(1)
+     ! Will stop the program
+     call pcheck(.true., errmsg)
+
+  end select poletype
 
   ! if I don't have the source
-  if (.not. have_src) then 
+  if (.not. have_src) then
      if (verbose > 1) write(69,'(/,a,/)') &
             "******  I  D O N ' T   H A V E   T H E   S O U R C E *******"
   endif
- 
+
   ! write all elements containing non-zero source term components to file
-  if (diagfiles .and. have_src .and. .not. fluid_src) then
-     open(619, file=infopath(1:lfinfo)//'/src_term.dat'//appmynum) 
-     open(621, file=infopath(1:lfinfo)//'/src_term_norm1.dat'//appmynum) 
-     open(622, file=infopath(1:lfinfo)//'/src_term_norm2.dat'//appmynum) 
-     open(623, file=infopath(1:lfinfo)//'/src_term_norm3.dat'//appmynum) 
+  if (diagfiles .and. have_src) then
+     open(619, file=infopath(1:lfinfo)//'/src_term.dat'//appmynum)
+     open(621, file=infopath(1:lfinfo)//'/src_term_norm1.dat'//appmynum)
+     open(622, file=infopath(1:lfinfo)//'/src_term_norm2.dat'//appmynum)
+     open(623, file=infopath(1:lfinfo)//'/src_term_norm3.dat'//appmynum)
      open(6200, file=infopath(1:lfinfo)//'/src_term_allcomp.dat'//appmynum)
      do ielem=1, nel_solid
-        if  (maxval(abs(source_term(:,:,ielem,:))) /= zero) then
+        if (maxval(abs(source_term(:,:,ielem,:))) /= zero) then
            do ipol=0, npol
               do jpol=0, npol
                 call compute_coordinates(s, z, r, theta, ielsolid(ielem), ipol, jpol)
@@ -378,37 +358,24 @@ subroutine compute_src
   endif !have_src
 
   ! construct source term array that only lives on nonzero elements (max. 8)
-  if (fluid_src) then
-      allocate(source_term_fl(0:npol,0:npol,8))
-      source_term_fl = zero
-      k = 0 
-      do ielem = 1, nel_fluid
-         if ( maxval(abs(source_term(:,:,ielem,1))) > zero) then
-            k = k + 1
-            ielsrc(k) = ielem
-            source_term_fl(:,:,k) = source_term(:,:,ielem,1)
-         endif
-      enddo
-  else
-      allocate(source_term_el(0:npol,0:npol,8,3))
-      source_term_el = zero
-      k = 0 
-      do ielem = 1, nel_solid
-         if ( maxval(abs(source_term(:,:,ielem,:))) > zero) then
-            k = k + 1
-            ielsrc(k) = ielem
-            source_term_el(:,:,k,:) = source_term(:,:,ielem,:)
-         endif
-      enddo
-  endif
+  allocate(source_term_el(0:npol,0:npol,8,3))
+  source_term_el = zero
+  k = 0
+  do ielem = 1, nel_solid
+     if ( maxval(abs(source_term(:,:,ielem,:))) > zero) then
+        k = k + 1
+        ielsrc(k) = ielem
+        source_term_el(:,:,k,:) = source_term(:,:,ielem,:)
+     endif
+  enddo
   nelsrc = k
-     
+
   if (verbose > 1) write(69,*) 'nelsrc =', nelsrc
 
   deallocate(source_term)
 
-  if (nelsrc > 8) then 
-     write(6,'(a,a,/,a,i4,a,/,a,a)') &
+  if (nelsrc > 8) then
+     write(*,'(a,a,/,a,i4,a,/,a,a)') &
              procstrg, 'PROBLEM with source term element count!', &
              procstrg, nelsrc, ' elements with nonzero entries found but 8 is max', &
              procstrg, '(hitting the edge of an element at the bottom of a doubling layer).'
@@ -416,13 +383,13 @@ subroutine compute_src
   endif
 
   if (have_src) then
-     write(6,'(a,i2,/,a,/,a,/,a)') &
+     write(*,'(a,i2,/,a,/,a,/,a)') &
            '  number of elements with non-zero source term:', nelsrc, &
            '  *********************************', &
            '     End of source term calculator', &
            '  *********************************'
   endif
-  if (verbose > 1) then 
+  if (verbose > 1) then
      write(69,*)'  *********************************'
      write(69,*)'     End of source term calculator'
      write(69,*)'  *********************************'
@@ -436,13 +403,13 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
 
   use data_mesh
   use utlity
-  use commun, only: pmin, psum_int, broadcast_log
-  
+  use commun, only: pmin, psum_int
+
   integer, intent(out) :: iel_src2, ipol_src2, jpol_src2
   real(kind=dp)        :: s, z, r, theta, mydzsrc, zsrcout, dzsrc
-  integer              :: ielem, ipol, jpol, count_src_procs, iproc_src
+  integer              :: ielem, ipol, jpol, count_src_procs
   character(len=256)   :: errmsg
-  
+
   ! find depth that is closest to desired value zsrc
 
   dzsrc = 10.d0 * router
@@ -451,12 +418,12 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
   call pcheck(zsrc > router, errmsg)
 
   ! Only allow sources in the solid region, fixated to northern axis.
-  do ielem = 1, nelem
+  do ielem = 1, nel_solid
      do ipol = 0, npol
         do jpol = 0, npol
-           call compute_coordinates(s, z, r, theta, ielem, ipol, jpol)
-           if (abs(s)>smallval_dble .or. z<smallval_dble) cycle
-           if (dabs(z-zsrc) < dzsrc) then 
+           call compute_coordinates(s, z, r, theta, ielsolid(ielem), ipol, jpol)
+           if (abs(s) > smallval_dble .or. z < smallval_dble) cycle
+           if (dabs(z-zsrc) < dzsrc) then
               zsrcout = z
               dzsrc = dabs(zsrcout - zsrc)
               iel_src = ielem
@@ -465,7 +432,7 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
               iel_src2 = ielem
               ipol_src2 = ipol
               jpol_src2 = jpol
-           elseif (dabs(z-zsrc) == dzsrc) then 
+           else if (dabs(z-zsrc) == dzsrc) then
               if (verbose > 1) write(69,15) ielem,ipol,jpol,z/1000.
               iel_src2 = ielem
               ipol_src2 = ipol
@@ -475,6 +442,7 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
      enddo
   enddo
 15 format('  found a second point with same distance:', i6, i3, i3, 1pe13.3)
+
 
   ! Make sure only closest processor has source
   mydzsrc = dzsrc
@@ -489,38 +457,27 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
      if (have_src) count_src_procs = 1
      count_src_procs = psum_int(count_src_procs)
 
-     if (count_src_procs > 2) then 
-        if (lpr) then 
-           write(6,*)
-           write(6,*) 'PROBLEM with source & processors!'
-           write(6,*) 'More than two processors have the source:'
-        endif
-        if (have_src) write(6,*) procstrg, 'has it.'
-        stop
-     elseif (count_src_procs == 0) then 
+     if (count_src_procs > 2) then
         if (lpr) then
-           write(6,*)
-           write(6,*) 'PROBLEM with source & processors!'
-           write(6,*) 'No processor has the source.'
+           write(*,*)
+           write(*,*) 'PROBLEM with source & processors!'
+           write(*,*) 'More than two processors have the source:'
+        endif
+        if (have_src) write(*,*) procstrg, 'has it.'
+        stop
+     else if (count_src_procs == 0) then
+        if (lpr) then
+           write(*,*)
+           write(*,*) 'PROBLEM with source & processors!'
+           write(*,*) 'No processor has the source.'
         endif
         stop
-     endif 
-  endif !nproc>1
+     endif
+  endif !nproc > 1
 
   if (have_src) then
-
-     ! @TODO: check if both elements are in either the solid or the fluid
-     if (iel_src > nel_fluid) then
-         iel_src = iel_src - nel_fluid
-         iel_src2 = iel_src2 - nel_fluid
-         fluid_src = .false.
-     else
-         fluid_src = .true.
-     endif
-
-
      if (ipol_src /= 0) then
-        write(6,'(a,/,a,i7,i2,i2)') & 
+        write(*,'(a,/,a,i7,i2,i2)') &
               'ERROR: Source should be on axis, i.e. ipol_src=0, but:', &
               'Source location: ielem, ipol, jpol: ', &
               ielsolid(iel_src), ipol_src, jpol_src
@@ -528,7 +485,7 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
      endif
 
      if (thetacoord(ipol_src, jpol_src, ielsolid(iel_src)) /= zero) then
-        write(6,'(a,/,i7,2i2,/,a,3e10.2)') &
+        write(*,'(a,/,i7,2i2,/,a,3e10.2)') &
                 'ERROR: Source should be on the axis, hence theta = 0, but:', &
                 'Source indices ielem, ipol, jpol:', &
                 ielsolid(iel_src), ipol_src, jpol_src, &
@@ -538,13 +495,13 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
         stop
      endif
 
-     write(6,*) '  ',procstrg,' found it:'
-     write(6,*) '    depth asked for [km]:', (router - zsrc) / 1000.d0
-     write(6,*) '    depth offered   [km]:', (router - zsrcout) / 1000.d0
-     write(6,*) '    difference      [km]:', dzsrc / 1000.d0
-     if (verbose>1) then
-         write(6,*) '    source element      : ', iel_src, ielsolid(iel_src)
-     end if
+     write(*,*) '  ',procstrg,' found it:'
+     write(*,*) '    depth asked for [km]:', (router - zsrc) / 1000.d0
+     write(*,*) '    depth offered   [km]:', (router - zsrcout) / 1000.d0
+     write(*,*) '    difference      [km]:', dzsrc / 1000.d0
+     if (verbose > 1) then
+         write(*,*) '    source element      : ', iel_src, ielsolid(iel_src)
+     endif
 
      if (verbose > 1) then
         write(69,*) '  ',procstrg,' found it:'
@@ -556,12 +513,12 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
 
      if (iel_src2 /= iel_src) then
          call compute_coordinates(s, z, r, theta, ielsolid(iel_src2), ipol_src2, jpol_src2)
-         write(6,*) '    SECOND source element and jpol index:',  &
+         write(*,*) '    SECOND source element and jpol index:', &
                             iel_src2, jpol_src2
-         write(6,*) '       s, z: ', s, z
+         write(*,*) '       s, z: ', s, z
 
          if (verbose > 1) then
-            write(69,*) '    SECOND source element and jpol index:',  &
+            write(69,*) '    SECOND source element and jpol index:', &
                                iel_src2,jpol_src2
             write(69,*) '      s, z: ', s, z
             write(69,*) '    depth offered   [km]:',(router-z)/1000.d0
@@ -570,15 +527,6 @@ subroutine find_srcloc(iel_src2, ipol_src2, jpol_src2)
 
      zsrc = zsrcout
   endif
-
-  if (have_src) then
-     iproc_src = mynum
-  else
-     iproc_src = 0
-  end if
-  iproc_src = psum_int(iproc_src)
-  call broadcast_log(fluid_src, iproc_src)
-
 
 end subroutine find_srcloc
 !-----------------------------------------------------------------------------------------
@@ -649,7 +597,7 @@ subroutine errorf
 
   do i=1, niter
      t = dble(i) * deltat
-     stf(i) = erf(decay / t_0 * (t - shift_fact))*0.5 + 0.5 
+     stf(i) = erf(decay / t_0 * (t - shift_fact))*0.5 + 0.5
   enddo
 
   dt_src_shift = shift_fact ! Taken from Gauss
@@ -674,19 +622,19 @@ function erf(x)
   real(kind=dp), dimension(ncoeff) :: coeffs =                         &
       [-1.26551223,  1.00002368, 0.37409196,  0.09678418, -0.18628806, &
         0.27886807, -1.13520398, 1.48851587, -0.82215223,  0.17087277]
-  
+
   z = abs(x)
   t = 1.0 / (1.0 + 0.5 * z)
-  
+
   polyval = coeffs(ncoeff)
   do icoeff = ncoeff-1, 1, -1
       polyval = t * polyval + coeffs(icoeff)
-  end do
-  
+  enddo
+
   erfcc = t * exp(-z * z + polyval)
-  
+
   if (x < 0.0) erfcc = 2.0 - erfcc
-  erf = 1 - erfcc 
+  erf = 1 - erfcc
 
 end function erf
 !-----------------------------------------------------------------------------------------
@@ -700,7 +648,7 @@ subroutine delta_src
   character(len=6)          :: dirac_approx(6)
   real(kind=dp),allocatable :: signal(:), timetmp(:), int_stf(:)
 
-  if (lpr) write(6,*)'Discrete Dirac choice: ',discrete_choice
+  if (lpr) write(*,*)'Discrete Dirac choice: ',discrete_choice
   allocate(signal(1:niter))
   allocate(timetmp(1:niter))
   allocate(int_stf(1:niter))
@@ -708,94 +656,94 @@ subroutine delta_src
   stf = 0
   a = discrete_dirac_halfwidth
 
-  if (lpr) write(6,*) 'Half-width of discrete Dirac [s]: ', a
+  if (lpr) write(*,*) 'Half-width of discrete Dirac [s]: ', a
 
   dirac_approx = ['cauchy','caulor','sincfc','gaussi','triang','1dirac']
   !@TODO: there is no userinterface for this atm, so only gaussi and 1dirac are
-  !       actually used 
+  !       actually used
 
   do j=1, 6
      signal = 0
-     if (lpr .and. trim(discrete_choice)==trim(dirac_approx(j))) &
-              write(6,*)' Approximation type:',trim(dirac_approx(j))
-     if (lpr.and.diagfiles) then
+     if (lpr .and. trim(discrete_choice) == trim(dirac_approx(j))) &
+              write(*,*)' Approximation type:',trim(dirac_approx(j))
+     if (lpr .and. diagfiles) then
          open(unit=60,file=infopath(1:lfinfo)//'/discrete_dirac_'//trim(dirac_approx(j))//'.dat')
-     end if
+     endif
 
      do i=1,niter
         t=dble(i)*deltat
         timetmp(i) = t
-        if (dirac_approx(j)=='cauchy') then ! Cauchy phi function
+        if (dirac_approx(j) == 'cauchy') then ! Cauchy phi function
            signal(i) = 1./a * exp(-abs((t - shift_fact_discrete_dirac) / a))
            dt_src_shift = shift_fact_discrete_dirac
 
-        elseif (dirac_approx(j)=='caulor') then ! Cauchy Lorentz distribution
+        else if (dirac_approx(j) == 'caulor') then ! Cauchy Lorentz distribution
            signal(i) = 1. / pi * a / (a**2 + (t - shift_fact_discrete_dirac)**2)
            dt_src_shift = shift_fact_discrete_dirac
 
-        elseif (dirac_approx(j)=='sincfc') then ! sinc function
+        else if (dirac_approx(j) == 'sincfc') then ! sinc function
            !@TODO: is this because of division by zero? what about putting signal
            !       to 1? (MvD)
-           if (t==shift_fact_discrete_dirac) t = 0.00001 + shift_fact_discrete_dirac
+           if (t == shift_fact_discrete_dirac) t = 0.00001 + shift_fact_discrete_dirac
 
            signal(i) = 1. / (a * pi) * sin((-shift_fact_discrete_dirac + t) / a) &
                             / ((-shift_fact_discrete_dirac + t) / a)
            dt_src_shift = shift_fact_discrete_dirac
 
-        elseif (dirac_approx(j)=='gaussi') then ! Gaussian
+        else if (dirac_approx(j) == 'gaussi') then ! Gaussian
            signal(i) = 1. / (a * sqrt(pi)) * exp(-((t - shift_fact_discrete_dirac) / a)**2)
            dt_src_shift = shift_fact_discrete_dirac
 
-        elseif (dirac_approx(j)=='triang') then ! triangular
-           if (abs(t-shift_fact_discrete_dirac) <= a / 2.) then 
+        else if (dirac_approx(j) == 'triang') then ! triangular
+           if (abs(t-shift_fact_discrete_dirac) <= a / 2.) then
               signal(i) = 2. / a - 4. / a**2 * abs(t - shift_fact_discrete_dirac)
            else
               signal(i) = 0.
            endif
            dt_src_shift = shift_fact_discrete_dirac
 
-        elseif (dirac_approx(j)=='1dirac') then ! old Dirac, 1 non-zero point
-           if (i==int(shift_fact_discrete_dirac / deltat)) then 
+        else if (dirac_approx(j) == '1dirac') then ! old Dirac, 1 non-zero point
+           if (i == int(shift_fact_discrete_dirac / deltat)) then
               signal(i) = 1.
               dt_src_shift = real(i) * deltat
            endif
         else
-           write(6,*)'do not know discrete Dirac ', trim(dirac_approx(j))
+           write(*,*)'do not know discrete Dirac ', trim(dirac_approx(j))
            stop
         endif
 
-        if (lpr.and.diagfiles) write(60,*) t, magnitude * signal(i)   
+        if (lpr .and. diagfiles) write(60,*) t, magnitude * signal(i)
      enddo
 
-     if (lpr.and.diagfiles) close(60)
+     if (lpr .and. diagfiles) close(60)
 
-     if (trim(discrete_choice)==trim(dirac_approx(j)) ) then
-        if (lpr) write(6,*)'  dirac type and max amp before:',trim(dirac_approx(j)),maxval(signal)
+     if (trim(discrete_choice) == trim(dirac_approx(j)) ) then
+        if (lpr) write(*,*)'  dirac type and max amp before:',trim(dirac_approx(j)),maxval(signal)
         integral = sum(signal)*deltat
-        if (lpr) write(6,*)'  OLD Integral of discrete dirac:',integral
+        if (lpr) write(*,*)'  OLD Integral of discrete dirac:',integral
         signal = signal/integral
-        
-        if (lpr) write(6,*)'  dirac type and max amp after:',trim(dirac_approx(j)),maxval(signal)
-        integral = sum(signal)*deltat
-        if (lpr) write(6,*)'  NEW Integral of discrete dirac:',integral      
-        if (lpr) write(6,*)"  Shift factor [s],#dt's:",dt_src_shift,dt_src_shift/deltat
-        if (lpr) write(6,*)
 
-        stf(1:niter) = signal(1:niter) 
+        if (lpr) write(*,*)'  dirac type and max amp after:',trim(dirac_approx(j)),maxval(signal)
+        integral = sum(signal)*deltat
+        if (lpr) write(*,*)'  NEW Integral of discrete dirac:',integral
+        if (lpr) write(*,*)"  Shift factor [s],#dt's:",dt_src_shift,dt_src_shift/deltat
+        if (lpr) write(*,*)
+
+        stf(1:niter) = signal(1:niter)
      endif
   enddo
 
   stf = stf * magnitude
- 
+
   ! Integrate STF over time for Heaviside function
   int_stf = 0
   signal = 0
   do i=1, niter
-     if (i>1) signal(i) = int_stf(i-1)
+     if (i > 1) signal(i) = int_stf(i-1)
      int_stf(i) = signal(i) + stf(i) * deltat
   enddo
 
-  if (lpr.and.diagfiles)  then 
+  if (lpr .and. diagfiles) then
      open(unit=61,file=infopath(1:lfinfo)//'/discrete_chosen_dirac_'//trim(discrete_choice)//'.dat')
      open(unit=62,file=infopath(1:lfinfo)//'/discrete_chosen_heavi_'//trim(discrete_choice)//'.dat')
      do i=1, niter
@@ -805,10 +753,10 @@ subroutine delta_src
      close(61)
      close(62)
   endif
-  
+
   ! Quasi-Heaviside
-  if (trim(stf_type)=='quheavi') stf = int_stf
-  
+  if (trim(stf_type) == 'quheavi') stf = int_stf
+
   deallocate(timetmp,signal,int_stf)
 
 end subroutine delta_src
@@ -878,7 +826,7 @@ subroutine errorf_t(nstf_t, t, stf_t)
   integer                          :: i
 
   do i=1,nstf_t
-     stf_t(i) = erf(decay / t_0 * (t(i) - shift_fact)) * 0.5 + 0.5 
+     stf_t(i) = erf(decay / t_0 * (t(i) - shift_fact)) * 0.5 + 0.5
   enddo
   dt_src_shift = shift_fact
   stf_t = stf_t * magnitude
@@ -909,7 +857,7 @@ subroutine quasiheavi_t(nstf_t, stf_t)
 
   integer, intent(in)           :: nstf_t
   real(kind=dp), intent(out)    :: stf_t(nstf_t)
- 
+
   stf_t = 0
   stf_t(seis_it:nstf_t) = magnitude
   dt_src_shift = seis_it
@@ -922,9 +870,9 @@ subroutine define_bodyforce(f, iel_src2, ipol_src2, jpol_src2)
 
   use data_mesh
   use utlity
-  use commun, only: pdistsum_solid_1D, pdistsum_fluid
-  
-  real(kind=realkind), intent(out) :: f(0:,0:,:)
+  use commun, only: pdistsum_solid_1D
+
+  real(kind=realkind), intent(out) :: f(0:npol,0:npol,nel_solid)
   integer, intent(in)              :: iel_src2, ipol_src2, jpol_src2
   integer                          :: liel_src, lipol_src, ljpol_src, ipol, jpol, i
   character(len=16)                :: fmt1
@@ -940,13 +888,9 @@ subroutine define_bodyforce(f, iel_src2, ipol_src2, jpol_src2)
   endif
 
   ! assembly
-  if (fluid_src) then
-     call pdistsum_fluid(f)
-  else
-     call pdistsum_solid_1D(f)
-  endif
+  call pdistsum_solid_1D(f)
 
-  if (have_src .and. verbose > 1 .and. .not. fluid_src) then
+  if (have_src .and. verbose > 1) then
 
      ! write out the source element
      fmt1 = "(K(1pe12.3))"
@@ -966,7 +910,7 @@ subroutine define_bodyforce(f, iel_src2, ipol_src2, jpol_src2)
         endif
         write(69,*) 'iel,jpol,r:', liel_src, ljpol_src, &
              rcoord(lipol_src, ljpol_src, ielsolid(liel_src)) / 1.d3
-        write(69,*) 'North| s-dir -->'
+        write(69,*) 'North| s-dir -- > '
         do jpol=npol, 0, -1
            write(69,fmt1) (f(ipol, jpol, liel_src), ipol=0,npol)
         enddo
@@ -979,25 +923,26 @@ end subroutine define_bodyforce
 !-----------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------
-!> Defines the moment tensor elements for the given source type in all 
+!> Defines the moment tensor elements for the given source type in all
 !! elements having non-zero source contributions,
 !! using pointwise derivatives of arbitrary scalar functions.
 subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
-  
+
   use data_mesh
-  
+
   use apply_masks
   use utlity
   use pointwise_derivatives
   use commun, only: pdistsum_solid, psum_int
-  
+
   integer, intent(in)              :: iel_src2, ipol_src2, jpol_src2
   real(kind=realkind), intent(out) :: source_term(0:npol,0:npol,nel_solid,3)
   integer                          :: liel_src, lipol_src, ljpol_src
-  
-  real(kind=realkind), allocatable :: ws(:,:,:), dsws(:,:,:), dzwz(:,:,:)
+
+  real(kind=realkind), allocatable :: ws(:,:,:), dsws(:,:,:)
+  real(kind=realkind), allocatable :: ws_over_s(:,:,:), dzwz(:,:,:)
   real(kind=realkind), allocatable :: ds(:), dz(:)
-  
+
   integer                          :: ielem, ipol, jpol, i, nsrcelem, nsrcelem_glob
   character(len=16)                :: fmt1
 
@@ -1008,7 +953,7 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
   nsrcelem = 0
   if (have_src) then
      nsrcelem = 1
-     if (iel_src2 /= iel_src) then 
+     if (iel_src2 /= iel_src) then
         nsrcelem = 2
      else
         nsrcelem = 1
@@ -1017,18 +962,24 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
 
   allocate(ws(0:npol,0:npol,1:nsrcelem))
   allocate(dsws(0:npol,0:npol,1:nsrcelem))
+  allocate(ws_over_s(0:npol,0:npol,1:nsrcelem))
   allocate(dzwz(0:npol,0:npol,1:nsrcelem))
   allocate(ds(0:npol),dz(0:npol))
+
+  dzwz(:,:,:) = zero
+  dsws(:,:,:) = zero
+  ws_over_s(:,:,:) = zero
+  source_term(:,:,:,:) = zero
 
   ! global number of source elements (in case source is on processor boundary)
   nsrcelem_glob = psum_int(nsrcelem)
 
   if (verbose > 1 ) write(69,*) 'nsrcelem_glob =', nsrcelem_glob
 
-  if (have_src) then 
+  if (have_src) then
      ! physical source location can only be in 2 elements
      do i=1, nsrcelem
-        if (i == 2) then 
+        if (i == 2) then
            liel_src = iel_src2
            lipol_src = ipol_src2
            ljpol_src = jpol_src2
@@ -1037,7 +988,7 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
         do ipol = 0,npol
            do jpol = 0,npol
 
-              ws(:,:,:) = zero 
+              ws(:,:,:) = zero
               ws(ipol,jpol,i) = one
               call dsdf_elem_solid(dsws(:,:,i), ws(:,:,i), liel_src)
               call dzdf_elem_solid(dzwz(:,:,i), ws(:,:,i), liel_src)
@@ -1049,31 +1000,31 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
                  select case (src_type(2))
 
                  case ('explosion')
-                    if (ipol==0 .and. jpol==0  .and. lpr) &
-                         write(6,*)'  ',procstrg, &
+                    if (ipol == 0 .and. jpol == 0 .and. lpr) &
+                         write(*,*)'  ',procstrg, &
                         'computing source s- and z-components for explosion'
 
                     source_term(ipol,jpol,liel_src,1) = &
                          two * dsws(lipol_src,ljpol_src,i)
                     source_term(ipol,jpol,liel_src,3) = &
                          dzwz(lipol_src,ljpol_src,i)
-                 
-                 case ('mtt_p_mpp' ) 
-                    if (ipol==0 .and. jpol==0 .and. lpr)  &
-                         write(6,*)'  ',procstrg, &
+
+                 case ('mtt_p_mpp' )
+                    if (ipol == 0 .and. jpol == 0 .and. lpr)  &
+                         write(*,*)'  ',procstrg, &
                          'computing source s-component for Mxx+Myy'
                     source_term(ipol,jpol,liel_src,1) = &
                           dsws(lipol_src,ljpol_src,i)
 
                  case ('mrr')
-                    if (ipol==0 .and. jpol==0 .and. lpr)  &
-                         write(6,*)'  ',procstrg, &
+                    if (ipol == 0 .and. jpol == 0 .and. lpr)  &
+                         write(*,*)'  ',procstrg, &
                          'computing source field z-component for Mzz'
                     source_term(ipol,jpol,liel_src,3) = &
                          dzwz(lipol_src,ljpol_src,i)
 
                  case default
-                    write(6,'(a,a,/,a,a,a)') &
+                    write(*,'(a,a,/,a,a,a)') &
                          procstrg, 'PROBLEM: Didn"t compute any source: ', &
                          procstrg, 'Monopole source doesn"t exist for ', src_type(2)
                     stop
@@ -1084,15 +1035,15 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
                  select case(src_type(2))
 
                  case ('mtr','mpr')
-                    if (ipol==0 .and. jpol==0 .and. lpr)  &
-                         write(6,*) '  computing source + and z-components for Mtr'
+                    if (ipol == 0 .and. jpol == 0 .and. lpr)  &
+                         write(*,*) '  computing source + and z-components for Mtr'
                     source_term(ipol, jpol, liel_src, 1) =  &
                          dzwz(lipol_src, ljpol_src, i)
                     source_term(ipol, jpol, liel_src, 3) =  &
                          dsws(lipol_src, ljpol_src, i)
 
                  case default
-                    write(6,'(a,a,/,a,a,a)') &
+                    write(*,'(a,a,/,a,a,a)') &
                          procstrg, 'PROBLEM: Didn"t compute any source!', &
                          procstrg, 'Dipole source doesn"t exist for ', src_type(2)
                     stop
@@ -1102,25 +1053,25 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
               case ('quadpole') poletype
                  select case (src_type(2))
 
-                 case ('mtp','mtt_m_mpp') 
-                    if (ipol==0 .and. jpol==0 .and. lpr)  &
-                         write(6,*) '  computing source s- and phi-components for Mtp'
+                 case ('mtp','mtt_m_mpp')
+                    if (ipol == 0 .and. jpol == 0 .and. lpr)  &
+                         write(*,*) '  computing source s- and phi-components for Mtp'
                     source_term(ipol,jpol,liel_src,1) = &
-                         dsws(lipol_src,ljpol_src,i) 
+                         dsws(lipol_src,ljpol_src,i)
                     source_term(ipol,jpol,liel_src,2) = &
-                         dsws(lipol_src,ljpol_src,i) 
+                         ws_over_s(lipol_src,ljpol_src,i)
                  case default
-                    write(6,'(a,a,/,a,a,a)') &
+                    write(*,'(a,a,/,a,a,a)') &
                          procstrg, "PROBLEM: Didn't compute any source!", &
                          procstrg, "Quadrupole doesn't exist for", src_type(2)
                     stop
                  end select
               end select poletype
-           end do !jpol
-        end do ! ipol
+           enddo !jpol
+        enddo ! ipol
      enddo ! multiple source elements
 
-     ! If spread over multiple elements (i.e., if point source coincides 
+     ! If spread over multiple elements (i.e., if point source coincides
      ! with element edge/corner), need to divide by global source element number
      source_term = source_term / real(nsrcelem_glob)
 
@@ -1130,7 +1081,7 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
 
   ! assembly
   if (verbose > 1) write(69,*) '  ', procstrg, 'assembling the source term....'
-  call pdistsum_solid(source_term) 
+  call pdistsum_solid(source_term)
 
   ! cut out round-off errors
   do ielem=1, nel_solid
@@ -1148,7 +1099,7 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
 
   if (have_src) then
      if (maxval(abs(source_term)) == zero) then
-        write(6,'(a,a,/,a,a)') procstrg, 'PROBLEM: No source generated!', &
+        write(*,'(a,a,/,a,a)') procstrg, 'PROBLEM: No source generated!', &
                                procstrg, 'Bye from define_mono_moment'
         stop
      endif
@@ -1159,16 +1110,16 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
   case ('monopole')
      call apply_axis_mask_onecomp(source_term, nel_solid, ax_el_solid, &
                                   naxel_solid)
-  case ('dipole') 
+  case ('dipole')
      call apply_axis_mask_twocomp(source_term, nel_solid, ax_el_solid, &
                                   naxel_solid)
-  case ('quadpole') 
+  case ('quadpole')
      call apply_axis_mask_threecomp(source_term, nel_solid, ax_el_solid, &
                                     naxel_solid)
   end select
 
   if (lpr .and. verbose > 0) &
-     write(6,*)'  ...masked the source'
+     write(*,*)'  ...masked the source'
 
   if (have_src) then
      ! write out the source element only
@@ -1176,7 +1127,7 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
      write(fmt1(2:2),'(i1.1)') npol + 1
 
      if (verbose > 1) then
-     
+
         write(69,'(/,a)') '  *^*^*^*^*^*^* The moment-tensor source term *^*^*^*^*^**^*^'
 
         liel_src = iel_src
@@ -1184,7 +1135,7 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
         ljpol_src = jpol_src
 
         do i =1, nsrcelem
-           if (i == 2) then 
+           if (i == 2) then
               liel_src = iel_src2
               lipol_src = ipol_src2
               ljpol_src = jpol_src2
@@ -1192,21 +1143,21 @@ subroutine define_moment_tensor(iel_src2, ipol_src2, jpol_src2, source_term)
 
            write(69,*) 'iel,jpol,r:', liel_src, ljpol_src, &
                 rcoord(lipol_src,ljpol_src,ielsolid(liel_src)) / 1.d3
-           write(69,*)'North| s-dir -->'
-           if (src_type(1)=='dipole') then
+           write(69,*)'North| s-dir -- > '
+           if (src_type(1) == 'dipole') then
               write(69,*) '  ', src_type(2), '+ component'
            else
-              write(69,*) '  ', src_type(2), 's component'   
+              write(69,*) '  ', src_type(2), 's component'
            endif
            do jpol=npol, 0, -1
               write(69,fmt1)(source_term(ipol,jpol,liel_src,1), ipol=0, npol)
            enddo
            write(69,*)
 
-           if (src_type(1)=='dipole') then
+           if (src_type(1) == 'dipole') then
               write(69,*)src_type(2), '- component'
            else
-              write(69,*)src_type(2), 'phi component'   
+              write(69,*)src_type(2), 'phi component'
            endif
            do jpol=npol, 0, -1
               write(69,fmt1)(source_term(ipol,jpol,liel_src,2), ipol=0,npol)

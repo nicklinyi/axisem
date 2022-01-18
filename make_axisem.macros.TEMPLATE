@@ -9,14 +9,10 @@
 # Set name of mpirun command on your system
 MPIRUN  = mpirun
 
-# Enable NetCDF 
-# Is needed to create wavefield files for Instaseis or MCKernel
-USE_NETCDF = true 
-# Use parallel netcdf. Enable, if your system supports it (or on HPC environments)
+# Enable NetCDF
+USE_NETCDF = false
 USE_PAR_NETCDF = false
-# Path to NetCDF libraries. If you used a system function to install it, leave
-# it empty. The Makefile will use /usr/include and /usr/lib in this case.
-NETCDF_PATH =       
+NETCDF_PATH =       # e.g. $(HOME)/local, uses /usr/include if not defined
 
 # compile without MPI (possible values: 'false', 'true')
 # make sure to build mesh with one processor, USE_PAR_NETCDF needs to be false
@@ -25,7 +21,7 @@ SERIAL = false
 # Include the file mpif.h, instead of using the FORTRAN MPI module 
 # Sometimes necessary when the local OpenMPI-version was not compiled with the
 # same version of the compiler as the one specified as $FC
-INCLUDE_MPI = true
+INCLUDE_MPI = false
 
 ####################################
 # Choose compiler names and flags: #
@@ -34,18 +30,18 @@ INCLUDE_MPI = true
 # GFORTRAN (fast)
 # OpenMP is supported by the MESHER and is useful for high-frequency
 # Meshes, i.e. <5s period. Uses up to 8 threads. Does not affect the SOLVER.
-# CC      = gcc
-# FC      = mpif90
-# FFLAGS  = -O3 -march=native -fopenmp        
-# CFLAGS  = -O3 -march=native                
-# LDFLAGS = -O3 -march=native -fopenmp      
-
-# GFORTRAN (debug)
 CC      = gcc
 FC      = mpif90
-FFLAGS  = -g -fbacktrace -fbounds-check -frange-check -pedantic 
-CFLAGS  = -g -fbacktrace -Wall 
-LDFLAGS = -g -fbacktrace -Wall
+FFLAGS  = -O3 #-march=native -fopenmp        
+CFLAGS  = -O3 #-march=native                
+LDFLAGS = -O3 #-march=native -fopenmp      
+
+# GFORTRAN (debug)
+#CC      = gcc
+#FC      = mpif90
+#FFLAGS  = -g -fbacktrace -Warray-temporaries -fcheck-array-temporaries -fbounds-check -frange-check -pedantic
+#CFLAGS  = -g -fbacktrace -Wall 
+#LDFLAGS = -g -fbacktrace -Wall
 
 # PORTLAND (fast)
 #CC      = pgcc 
