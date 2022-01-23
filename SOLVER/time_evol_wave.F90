@@ -311,7 +311,9 @@ subroutine sf_time_loop_newmark
      write(*,*)
   endif
 
+   ! LY: anel_true: anelastic == true
   if (anel_true) then
+     ! LY: att_coarse_grained: inparam_advanced.COARSE_GRAINED, default is true.
      if (att_coarse_grained) then
         allocate(memory_var_cg4(1:4,6,n_sls_attenuation,nel_solid))
         memory_var_cg4 = 0
